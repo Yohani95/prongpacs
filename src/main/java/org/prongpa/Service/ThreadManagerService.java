@@ -86,6 +86,7 @@ public class ThreadManagerService implements Runnable {
                     threadCount.incrementAndGet(); // Incrementar el contador de hilos
                 }
                 log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: "+configReader.getTimeout()/(60*1000)+" minutos");
+                log.info("Hilos trabajando actualmente: "+getThreadCount());
                 Thread.sleep(configReader.getTimeout()); // Esperar el intervalo de tiempo especificado para que se vuelvan a consultar las tareas
             }
             } catch (InterruptedException e) {

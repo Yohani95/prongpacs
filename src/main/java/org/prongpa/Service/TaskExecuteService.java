@@ -92,7 +92,7 @@ public class TaskExecuteService implements Runnable{
         }catch (Exception e){
             actualizarEstadoLista(this.taskModelList, task.getId(), "E");
             log.error("Error en la funcion Update, MENSAJE: "+e.getMessage() );
-            success=false;
+            success=true;
         }finally {
             return success;
         }
@@ -243,7 +243,6 @@ public class TaskExecuteService implements Runnable{
                     }else{
                         log.info("Reintentos maximo alcanzado para task: "+taskModel.getId()+", process_id: "+processId);
                         MoveToHistory();
-                        //callBackService.ExecuteCallBack(processId);
                         stop();
                         break;
                     }
