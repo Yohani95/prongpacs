@@ -1,0 +1,33 @@
+<configuration>
+    <!-- Directorio de logs -->
+    <property name="log-dir" value="./logs" />
+
+    <!-- Formato de los logs -->
+    <property name="log-pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+    <!-- Añadir consola como destino de logs -->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log-pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Añadir archivo como destino de logs -->
+    <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log-dir}/log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log-dir}/log.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log-pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Nivel de log APLICACION-->
+    <root level="INFO">
+        <appender-ref ref="fileAppender" />
+    </root>
+    <!-- Nivel de log HIBERNATE -->
+    <logger name="org.hibernate" level="WARN" />
+</configuration>

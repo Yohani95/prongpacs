@@ -1,0 +1,240 @@
+2023-07-10 18:33:16.902 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 18:33:16.905 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 18:33:16.906 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 18:33:16.910 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 18:33:17.682 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:33:18.028 [main] WARN  org.hibernate.cfg.AnnotationBinder - HHH000139: Illegal use of @Table in a subclass of a SINGLE_TABLE hierarchy: org.prongpa.Models.TaskHistoryModel
+2023-07-10 18:33:18.616 [main] ERROR o.p.Service.ThreadManagerService - Error al Cargar configuracion del Hilo principal MENSAJE: Schema-validation: missing column [DTYPE] in table [tasks]
+2023-07-10 18:34:31.607 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 18:34:31.609 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 18:34:31.610 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 18:34:31.613 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 18:34:32.317 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:34:32.632 [main] WARN  org.hibernate.cfg.AnnotationBinder - HHH000139: Illegal use of @Table in a subclass of a SINGLE_TABLE hierarchy: org.prongpa.Models.TaskHistoryModel
+2023-07-10 18:34:33.160 [main] ERROR o.p.Service.ThreadManagerService - Error al Cargar configuracion del Hilo principal MENSAJE: Schema-validation: missing column [DTYPE] in table [tasks]
+2023-07-10 18:40:08.755 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 18:40:08.757 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 18:40:08.757 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 18:40:08.759 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 18:40:09.375 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:40:10.189 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 18:40:10.356 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:40:10.476 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:40:10.477 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 18:40:10.516 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 18:40:20.781 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 18:40:20.781 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 18:40:20.781 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:40:20.808 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:2
+2023-07-10 18:40:30.821 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 18:40:30.821 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 18:40:30.821 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:40:30.851 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:3
+2023-07-10 18:40:40.870 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 18:40:40.870 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 18:40:40.870 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:40:40.899 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:4
+2023-07-10 18:40:50.910 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 18:40:50.911 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 18:40:50.911 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:40:54.743 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Reintentos maximo alcanzado para task: 16, process_id: 1
+2023-07-10 18:40:55.992 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 1
+2023-07-10 18:41:03.547 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 18:41:03.547 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'model' doesn't have a default value
+2023-07-10 18:42:44.309 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 18:42:44.311 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 18:42:44.311 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 18:42:44.314 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 18:42:45.039 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:42:45.860 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 18:42:46.012 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 18:45:16.457 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 18:45:16.459 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 18:45:16.459 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 18:45:16.463 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 18:45:17.261 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:45:18.230 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 18:45:18.413 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:45:18.551 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:45:18.552 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 18:45:18.607 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 18:45:28.854 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 18:45:28.855 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 18:45:28.855 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:47:33.006 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Reintentos maximo alcanzado para task: 16, process_id: 1
+2023-07-10 18:47:34.273 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 1
+2023-07-10 18:48:55.652 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 18:48:55.653 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'model' doesn't have a default value
+2023-07-10 18:54:50.505 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 18:55:53.693 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 18:55:53.713 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 18:55:53.714 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'model' doesn't have a default value
+2023-07-10 18:56:16.581 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 18:56:16.583 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 18:56:16.585 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 18:56:16.589 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 18:56:17.297 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:56:18.088 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 18:56:18.257 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:56:18.358 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:56:18.360 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 18:56:18.413 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 18:56:28.630 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 18:56:28.631 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 18:56:28.631 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:56:31.839 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Reintentos maximo alcanzado para task: 16, process_id: 1
+2023-07-10 18:56:33.209 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 1
+2023-07-10 18:57:32.208 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 18:57:32.209 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'order' doesn't have a default value
+2023-07-10 18:58:29.478 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 18:58:29.478 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'order' doesn't have a default value
+2023-07-10 18:58:49.525 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 18:58:49.528 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 18:58:49.528 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 18:58:49.530 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 18:58:50.194 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:58:50.934 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 18:58:51.075 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 18:58:51.178 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:58:51.180 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 18:58:51.230 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 18:59:01.435 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 18:59:01.436 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 18:59:01.436 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 18:59:03.846 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Reintentos maximo alcanzado para task: 16, process_id: 1
+2023-07-10 18:59:04.425 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 1
+2023-07-10 18:59:11.820 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 18:59:11.820 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'order' doesn't have a default value
+2023-07-10 19:10:11.727 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:10:11.751 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 19:10:11.752 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'order' doesn't have a default value
+2023-07-10 19:13:57.451 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 19:13:57.452 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 19:13:57.453 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 19:13:57.456 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 19:13:58.257 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 19:13:59.054 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:13:59.177 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 19:14:14.868 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 19:14:14.871 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 19:14:14.871 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 19:14:14.874 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 19:14:15.544 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 19:14:16.326 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:14:16.485 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 19:14:16.593 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 19:14:16.595 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 19:14:16.640 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 19:14:26.872 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 19:14:26.873 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 19:14:26.873 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 19:14:26.896 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Reintentos maximo alcanzado para task: 16, process_id: 1
+2023-07-10 19:14:26.896 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 1
+2023-07-10 19:17:04.903 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 19:17:04.904 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'order' doesn't have a default value
+2023-07-10 19:25:09.518 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:25:09.542 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 19:25:30.996 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 19:25:30.998 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 19:25:30.998 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 19:25:31.001 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 19:25:31.606 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 19:25:32.245 [main] ERROR o.p.Service.ThreadManagerService - Error al Cargar configuracion del Hilo principal MENSAJE: Cannot use identity column key generation with <union-subclass> mapping for: org.prongpa.Models.TaskHistoryModel
+2023-07-10 19:27:27.138 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 19:27:27.141 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 19:27:27.141 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 19:27:27.143 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 19:27:36.874 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 19:27:36.876 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 19:27:36.876 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 19:27:36.878 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 19:27:37.478 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 19:27:38.237 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:27:38.386 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 19:27:38.493 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 19:27:38.494 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 19:27:38.526 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 19:27:48.743 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 19:27:48.743 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 19:27:48.743 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 19:27:48.767 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Reintentos maximo alcanzado para task: 16, process_id: 1
+2023-07-10 19:27:48.767 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 1
+2023-07-10 19:27:57.385 [Thread-3] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1364, SQLState: HY000
+2023-07-10 19:27:57.385 [Thread-3] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Field 'id' doesn't have a default value
+2023-07-10 19:32:38.496 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:32:38.502 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 19:37:38.511 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:37:38.522 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 19:42:38.525 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:42:38.536 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 19:47:38.551 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:47:38.556 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 19:52:38.569 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:52:38.578 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 19:57:38.582 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 19:57:38.593 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 20:02:38.593 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 20:02:38.603 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 20:07:38.605 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 20:07:38.615 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 20:12:38.630 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 20:12:38.640 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 20:21:40.912 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:22:53.934 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:23:22.473 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 20:23:22.475 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 20:23:22.476 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 20:23:22.489 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 20:23:23.111 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:23:23.819 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 20:23:23.956 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:23:24.053 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 20:23:24.055 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 20:23:24.102 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 20:23:34.313 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 20:23:34.313 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 20:23:34.314 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 20:23:34.346 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Reintentos maximo alcanzado para task: 27, process_id: 1
+2023-07-10 20:23:34.346 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 1
+2023-07-10 20:25:22.681 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 20:25:22.684 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 20:25:22.684 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 20:25:22.686 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 20:25:23.299 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:25:23.590 [main] ERROR o.p.Service.ThreadManagerService - Error al Cargar configuracion del Hilo principal MENSAJE: No identifier specified for entity: org.prongpa.Models.TaskHistoryModel
+2023-07-10 20:26:37.482 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 20:26:37.483 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 20:26:37.484 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 20:26:37.486 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 20:26:38.083 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:26:38.805 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 20:26:38.948 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:26:39.045 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 20:26:39.046 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 20:26:39.098 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 20:26:49.299 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error al realizar la solicitud HTTP: HTTP connect timed out
+2023-07-10 20:26:49.299 [Thread-3] ERROR o.prongpa.Service.TaskExecuteService - Error en la funcion Update, MENSAJE: Cannot invoke "java.net.http.HttpResponse.body()" because "response" is null
+2023-07-10 20:26:49.299 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 1
+2023-07-10 20:26:49.327 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Reintentos maximo alcanzado para task: 27, process_id: 1
+2023-07-10 20:26:49.328 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 1
+2023-07-10 20:31:39.052 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 20:31:39.062 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-10 20:32:34.032 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:32:49.701 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:34:57.776 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:35:31.107 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-10 20:35:31.109 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-10 20:35:31.109 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-10 20:35:31.112 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-10 20:35:31.714 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:35:32.425 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 20:35:32.565 [Thread-1] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-10 20:35:32.658 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Ejecutando Hilo para process_id: 12
+2023-07-10 20:35:38.457 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 300000 minutos
+2023-07-10 20:35:47.032 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 20:36:15.307 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 12
+2023-07-10 20:50:32.306 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-10 20:50:32.309 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - Proceso Terminado, process_id: 12
+2023-07-10 20:50:32.310 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - actualizando equipo en intento:1
+2023-07-10 20:50:32.311 [Thread-3] INFO  o.prongpa.Service.TaskExecuteService - se procede a mover hacia historico, processId: 12
+2023-07-10 20:50:32.336 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas

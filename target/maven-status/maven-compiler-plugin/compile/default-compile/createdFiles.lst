@@ -1,0 +1,16 @@
+org\prongpa\Models\TaskModel.class
+org\prongpa\Service\TaskService.class
+org\prongpa\Service\ThreadManagerService.class
+org\prongpa\Service\CallBackService.class
+org\prongpa\Service\TaskHistoryService.class
+org\prongpa\Service\TaskExecuteService.class
+org\prongpa\Repository\Task\HibernateTaskRepository.class
+org\prongpa\Repository\TaskHistory\HibernateTaskHistoryRepository.class
+org\prongpa\Main.class
+org\prongpa\Repository\TaskHistory\TaskHistoryRepository.class
+org\prongpa\Models\ConfigReader.class
+org\prongpa\Repository\Task\TaskRepository.class
+org\prongpa\Models\TaskHistoryModel.class
+org\prongpa\Repository\Hibernate\HibernateUtil.class
+org\prongpa\Repository\GenericRepository.class
+org\prongpa\Repository\Hibernate\HibernateGenericRepository.class

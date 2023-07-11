@@ -1,0 +1,7 @@
+2023-07-11 11:56:34.236 [main] INFO  org.prongpa.Main - 01-06-2023 - Iniciando Servicio version 1.0.0
+2023-07-11 11:56:34.251 [main] INFO  org.prongpa.Main - 04-07-2023 - Agregar logica al finalizar tasks CALLBACK 1.1.0
+2023-07-11 11:56:34.251 [main] INFO  org.prongpa.Models.ConfigReader - Cargando Configuracion
+2023-07-11 11:56:34.254 [main] INFO  o.p.Service.ThreadManagerService - Iniciando y cargando configuracion de Hilo padre
+2023-07-11 11:56:34.992 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+2023-07-11 11:56:35.883 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-11 11:56:36.011 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
