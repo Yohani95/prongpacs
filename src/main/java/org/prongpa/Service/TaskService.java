@@ -48,9 +48,10 @@ public class TaskService {
     public void updateByProcessId(List<TaskModel> tasks){
         List<TaskModel> listTasks=new ArrayList<>(tasks);
         for (TaskModel task: listTasks){
+            String oldStatus=task.getEstado();
             task.setEstado("P");
             taskRepository.save(task);
-            task.setEstado("I");
+            task.setEstado(oldStatus);
         }
     }
     public void delete(TaskModel taskModel){

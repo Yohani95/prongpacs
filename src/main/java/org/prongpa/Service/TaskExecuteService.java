@@ -123,15 +123,14 @@ public class TaskExecuteService implements Runnable{
                         // Comparar la versión de ACS con la versión anterior
                         String version_actual =""; //obtenerVersionACS(responseBody);
                         String version_anterior = taskModel.getVersion();
-
+                        sucess=true;
                         if (version_actual.equals(version_anterior)) {
                             // Actualización completa
                             //log.info("Actualización completa de la task " + taskModel.getId() + ", se moverá a la tabla histórica");
                             actualizarEstadoLista(this.taskModelList,taskModel.getId(),"F");
-                        } else {
-                            actualizarEstadoLista(this.taskModelList,taskModel.getId(),"E");
+                        }else{
+                            log.info("Aun esta pendiente la Actualización de la task " + taskModel.getId() + ", esperando intervalo de tiempo.");
                         }
-                        sucess=true;
                     }
                 }
             }
@@ -238,7 +237,10 @@ public class TaskExecuteService implements Runnable{
                                 MoveToHistory();
                                 stop();
                                 break;
+                            }else if(taskModel.getEstado()=="F"){
+                                break;
                             }
+                            Thread.sleep(configReader.getTimeout());
                         }
                     }else{
                         log.info("Reintentos maximo alcanzado para task: "+taskModel.getId()+", process_id: "+processId);
@@ -247,13 +249,13 @@ public class TaskExecuteService implements Runnable{
                         break;
                     }
                 }
-                log.info("Proceso Terminado, process_id: "+processId);
             }
-            ThreadManagerService.threadCount.decrementAndGet();
         }catch (Exception e){
             stop();
-            ThreadManagerService.threadCount.decrementAndGet();
             log.error("Error al ejecutar el process_id: "+processId+", MENSAJE: "+e.getMessage());
+        }finally {
+            log.info("Proceso Terminado, process_id: "+processId);
+            ThreadManagerService.threadCount.decrementAndGet();
         }
     }
     private void whenError(){
