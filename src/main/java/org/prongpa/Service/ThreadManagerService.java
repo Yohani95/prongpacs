@@ -58,6 +58,7 @@ public class ThreadManagerService implements Runnable {
             List<TaskModel> activeTasks = taskService.findByEstado("I");
             if(activeTasks.isEmpty()){
                 log.info("sin tareas activas");
+                log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: "+configReader.getTimeout()/(60*1000)+" minutos");
                 Thread.sleep(configReader.getTimeout());
             }else {
                 // Crear un HashMap para agrupar las tareas por process_id
@@ -84,7 +85,7 @@ public class ThreadManagerService implements Runnable {
                     taskThread.start();
                     threadCount.incrementAndGet(); // Incrementar el contador de hilos
                 }
-                log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: "+configReader.getTimeout()+" minutos");
+                log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: "+configReader.getTimeout()/(60*1000)+" minutos");
                 Thread.sleep(configReader.getTimeout()); // Esperar el intervalo de tiempo especificado para que se vuelvan a consultar las tareas
             }
             } catch (InterruptedException e) {

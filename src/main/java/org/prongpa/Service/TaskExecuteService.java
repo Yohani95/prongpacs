@@ -111,7 +111,7 @@ public class TaskExecuteService implements Runnable{
                     String responseBody = response.body();
 
                     // Evaluar el estado de la respuesta
-                    int status = 0 ;//evaluarEstadoRespuesta(responseBody);
+                    int status = responseBody.toLowerCase().contains("_value") ? 1 : 0;
 
                     if (status <= 0) {
                         // No se encontró el equipo en genieacs
@@ -168,7 +168,7 @@ public class TaskExecuteService implements Runnable{
                 }
             } else {
                 log.error("Error al realizar peticion HTTP para la tarea task: " + taskModel.getId());
-                actualizarEstadoLista(this.taskModelList,taskModel.getId(),"I");
+                actualizarEstadoLista(this.taskModelList,taskModel.getId(),"E");
                 sucess=false;
             }
         }catch (Exception e){
@@ -199,6 +199,7 @@ public class TaskExecuteService implements Runnable{
         log.info("se procede a mover hacia historico, processId: "+processId);
         taskHistoryService.saveOfTask(this.taskModelList);
         //taskService.deleteByProcessId(processId);
+        //callBackService.ExecuteCallBack(processId);
     }
 
     @Override
@@ -218,9 +219,17 @@ public class TaskExecuteService implements Runnable{
                         if(taskModel.getEstado().equals("I")){
                             taskModel.setEstado("P");
                             if(taskModel.getTasktype().equals("TR069")){
-                                if(!TR069(taskModel)){MoveToHistory(); stop(); break;};
+                                if(!TR069(taskModel)){
+                                    MoveToHistory();
+                                    stop();
+                                    break;
+                                };
                             }else{
-                                if(!update(taskModel)){MoveToHistory(); stop(); break;}
+                                if(!update(taskModel)) {
+                                    MoveToHistory();
+                                    stop();
+                                    break;
+                                }
                             }
                             Thread.sleep(configReader.getTimeout());
                             break;
@@ -240,10 +249,8 @@ public class TaskExecuteService implements Runnable{
                     }
                 }
                 log.info("Proceso Terminado, process_id: "+processId);
-                MoveToHistory();
-                //callBackService.ExecuteCallBack(processId);
-                stop();
             }
+            ThreadManagerService.threadCount.decrementAndGet();
         }catch (Exception e){
             stop();
             ThreadManagerService.threadCount.decrementAndGet();

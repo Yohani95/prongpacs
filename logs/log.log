@@ -63,3 +63,6 @@
 2023-07-11 13:02:09.515 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
 2023-07-11 13:02:09.521 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
 2023-07-11 13:02:09.521 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 5 minutos
+2023-07-11 13:07:09.523 [Thread-1] INFO  o.p.Service.ThreadManagerService - Buscando tareas activas
+2023-07-11 13:07:09.532 [Thread-1] INFO  o.p.Service.ThreadManagerService - sin tareas activas
+2023-07-11 13:07:09.532 [Thread-1] INFO  o.p.Service.ThreadManagerService - Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: 5 minutos

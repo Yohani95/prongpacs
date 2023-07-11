@@ -29,5 +29,5 @@
         <appender-ref ref="fileAppender" />
     </root>
     <!-- Nivel de log HIBERNATE -->
-    <logger name="org.hibernate" level="WARN" />
+    <logger name="org.hibernate" level="ERROR" />
 </configuration>
