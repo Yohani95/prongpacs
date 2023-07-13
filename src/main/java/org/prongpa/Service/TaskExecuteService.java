@@ -135,7 +135,8 @@ public class TaskExecuteService implements Runnable{
                 }
             }
         }catch (Exception e){
-
+            sucess=false;
+            actualizarEstadoLista(this.taskModelList,taskModel.getId(),"E");
         }finally {
             return sucess;
         }
@@ -237,10 +238,13 @@ public class TaskExecuteService implements Runnable{
                                 MoveToHistory();
                                 stop();
                                 break;
-                            }else if(taskModel.getEstado()=="F"){
-                                break;
                             }
-                            Thread.sleep(configReader.getTimeout());
+                            if(taskModel.getEstado()!="F"){
+                                Thread.sleep(configReader.getTimeout());
+                            }else{
+                                log.info("Tarea completada para task ID: "+taskModel.getId()+", process_id: "+processId);
+                                taskModelList.remove(taskModel);
+                            }
                         }
                     }else{
                         log.info("Reintentos maximo alcanzado para task: "+taskModel.getId()+", process_id: "+processId);
