@@ -4,8 +4,11 @@ import com.mysql.cj.xdevapi.JsonArray;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.prongpa.Models.ConfigDBModel;
 import org.prongpa.Models.ConfigReader;
 import org.prongpa.Models.TaskModel;
+import org.prongpa.Repository.Config.ConfigRepository;
+import org.prongpa.Repository.Config.HibernateConfigRepository;
 import org.prongpa.Repository.Task.HibernateTaskRepository;
 import org.prongpa.Repository.Task.TaskRepository;
 import org.prongpa.Repository.TaskHistory.HibernateTaskHistoryRepository;
@@ -30,6 +33,7 @@ public class TaskExecuteService implements Runnable{
     private TaskHistoryService taskHistoryService;
     private TaskHistoryRepository taskHistoryRepository;
     private String processId;
+    private ConfigDBModel configDBModel;
     CallBackService  callBackService;
     public TaskExecuteService(List<TaskModel> taskModellist, ConfigReader configReader, String processId) {
         this.taskModelList = taskModellist;
@@ -199,7 +203,7 @@ public class TaskExecuteService implements Runnable{
         log.info("se procede a mover hacia historico, processId: "+processId);
         taskHistoryService.saveOfTask(this.taskModelList);
         //taskService.deleteByProcessId(processId);
-        //callBackService.ExecuteCallBack(processId);
+        callBackService.ExecuteCallBack(processId);
     }
 
     @Override

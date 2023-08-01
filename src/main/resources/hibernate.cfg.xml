@@ -12,5 +12,6 @@
         <!-- Otras propiedades de configuracion -->
         <mapping class="org.prongpa.Models.TaskModel"/>
         <mapping class="org.prongpa.Models.TaskHistoryModel"/>
+        <mapping class="org.prongpa.Models.ConfigDBModel"/>
     </session-factory>
 </hibernate-configuration>

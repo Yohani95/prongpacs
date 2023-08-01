@@ -4,8 +4,11 @@ import com.mysql.cj.log.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.prongpa.Models.ConfigDBModel;
 import org.prongpa.Models.ConfigReader;
 import org.prongpa.Models.TaskModel;
+import org.prongpa.Repository.Config.ConfigRepository;
+import org.prongpa.Repository.Config.HibernateConfigRepository;
 import org.prongpa.Repository.Task.HibernateTaskRepository;
 import org.prongpa.Repository.Task.TaskRepository;
 
@@ -20,6 +23,7 @@ public class ThreadManagerService implements Runnable {
     private SessionFactory sessionFactory;
     private TaskService taskService;
     private boolean status=false;
+    private ConfigDBModel configDBModel;
     public static AtomicInteger threadCount = new AtomicInteger(0); // Variable de contador
     public ThreadManagerService(ConfigReader configReader) {
         this.configReader = configReader;
@@ -38,10 +42,19 @@ public class ThreadManagerService implements Runnable {
             // Crear una instancia del repositorio HibernateTaskRepository
             taskRepository = new HibernateTaskRepository(sessionFactory);
             taskService=new TaskService(taskRepository);
+
+            //sesion nueva para configuracion en bbdd
+            ConfigRepository configRepository=new HibernateConfigRepository(sessionFactory);
+            ConfigServices configServices=new ConfigServices(configRepository);
+            configDBModel=configServices.GetConfig();
+            configReader.setTimeout(Integer.parseInt(configDBModel.getAcsRestartTime())* 60 * 1000);
+            configReader.setMaxThreads(Integer.parseInt(configDBModel.getMaxThreads()));
+            configReader.setMaxRetries(Integer.parseInt(configDBModel.getMaxReintentos()));
             start();
             return true;
         }catch (Exception e){
             log.error("Error al Cargar configuracion del Hilo principal MENSAJE: "+e.getMessage());
+            log.error("No se Iniciara el servicio");
             return false;
         }
     }

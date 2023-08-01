@@ -44,7 +44,7 @@ public class TaskRepositoryTest {
         task.setManufacturer("fabricante");
         task.setNotificationId("notification-123");
         task.setCommands("comandos");
-        task.setOrderTask(3);
+        task.setOrderTask(4);
         // Establecer otros atributos
 
         // Guardar la tarea utilizando el repositorio

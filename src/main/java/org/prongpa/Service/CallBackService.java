@@ -60,14 +60,14 @@ public class CallBackService {
                     + "  <soapenv:Header/>\n"
                     + "  <soapenv:Body>\n"
                     + "    <cai3:Login>\n"
-                    + "      <cai3:userId>" + this.config.getUserCallBack() + "</cai3:userId>\n"
-                    + "      <cai3:pwd>" + this.config.getPasswordCallBack() + "</cai3:pwd>\n"
+                    + "      <cai3:userId>" + this.config.getUserSession() + "</cai3:userId>\n" // agregar user
+                    + "      <cai3:pwd>" + this.config.getPasswordSession() + "</cai3:pwd>\n"
                     + "    </cai3:Login>\n"
                     + "  </soapenv:Body>\n"
                     + "</soapenv:Envelope>";
 
             // Realiza la solicitud SOAP utilizando el método doSoapRequest
-            HttpResponse<String> response = doSoapRequest(this.config.getUrlCallBack(), soapBody);
+            HttpResponse<String> response = doSoapRequest(this.config.getUrlSession(), soapBody);
 
             // Verifica la respuesta y maneja el sessionId si es válido
             if (response != null && response.statusCode() == 200) {
@@ -138,9 +138,9 @@ public class CallBackService {
             HttpResponse<String> soapResponse = doSoapRequest(this.config.getUrlCallBack(), soapBody);
 
             if(soapResponse.statusCode()==200){
-                log.info("Notificacion enviada con exito");
+                log.info("Notificacion enviada con exito respuesta: " +soapResponse.body());
             } else if (soapResponse.statusCode()==1010) {
-                log.info("Error al enviar Notificacion, code: "+soapResponse.statusCode());
+                log.info("Error al enviar Notificacion, code: "+soapResponse.statusCode()+" respuesta: " +soapResponse.body());
             }
         } catch (Exception e) {
             log.info(e.getMessage());

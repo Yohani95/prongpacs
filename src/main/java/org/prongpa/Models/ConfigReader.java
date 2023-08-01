@@ -17,6 +17,9 @@ public class ConfigReader {
     private String urlCallBack;
     private String userCallBack;
     private String passwordCallBack;
+    private String urlSession;
+    private String userSession;
+    private String passwordSession;
     private int sessionIdTime;
     public boolean loadConfig() {
         Properties properties = new Properties();
@@ -37,6 +40,9 @@ public class ConfigReader {
             userCallBack=properties.getProperty("USER_CALLBACK");
             passwordCallBack=properties.getProperty("PASSWORD_CALLBACK");
             sessionIdTime = Integer.parseInt(properties.getProperty("SESSION_ID_TIME"));
+            urlSession = properties.getProperty("URL_SESSION_ID");
+            userSession=properties.getProperty("USER_SESSION");
+            passwordSession=properties.getProperty("PASSWORD_SESSION");
             return true;
         } catch (IOException e) {
             log.error("Error Al leer Configuracion MENSAJE: "+ e.getMessage());
