@@ -1,3 +1,10 @@
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.AfterEach;
@@ -8,12 +15,25 @@ import org.prongpa.Models.ConfigReader;
 import org.prongpa.Models.TaskModel;
 import org.prongpa.Repository.Task.HibernateTaskRepository;
 import org.prongpa.Service.CallBackService;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClients;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+
+
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -53,6 +73,31 @@ public class CallBackTest {
         callBackService.storeSessionId("123");
         String result=callBackService.validateSessionId("123");
         assertEquals("123",result);
+    }
+    @Test
+    public void sendcurl(){
+        String url = "http://localhost:30055/devices/00259E-HG8145X6-485754436015A8A7/tasks?timeout=3000&connection_request";
+        String requestBody = "{\"name\": \"download\", \"file\": \"XML_HG8145X6v4.0.xml\"}";
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-Type", "application/json");
+        httpPost.setEntity(new StringEntity(requestBody, "UTF-8"));
+
+        try {
+            HttpResponse response = httpClient.execute(httpPost);
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity, "UTF-8");
+
+            System.out.println("Response Code: " + response.getStatusLine().getStatusCode());
+            System.out.println("Response Body: " + responseBody);
+
+        } catch (IOException e) {
+            System.err.println("Error al realizar la solicitud HTTP: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterEach

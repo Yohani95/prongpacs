@@ -13,7 +13,7 @@ TaskHistoryService {
 
     public TaskHistoryService(TaskHistoryRepository taskHistoryRepository) {this.taskHistoryRepository = taskHistoryRepository;}
 
-    public void saveTask(TaskHistoryModel task) {taskHistoryRepository.save(task);}
+    public void saveTask(TaskModel task) {TaskHistoryModel taskHistoryModel=setData(task); taskHistoryRepository.save(taskHistoryModel);}
 
     public TaskHistoryModel getTaskById(Long id) {
         return taskHistoryRepository.findById(id);
@@ -60,6 +60,7 @@ TaskHistoryService {
             taskHistoryModel.setVersion(task.getVersion());
             taskHistoryModel.setProcess_id(task.getProcess_id());
             taskHistoryModel.setIdcompuesto(task.getIdcompuesto());
+            taskHistoryModel.setMercado(task.getMercado());
             return taskHistoryModel;
     }
     public void saveByTaskModel(TaskModel task){

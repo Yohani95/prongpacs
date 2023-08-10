@@ -2,24 +2,27 @@ package org.prongpa.Service;
 
 import com.mysql.cj.xdevapi.JsonArray;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.prongpa.Models.ConfigDBModel;
 import org.prongpa.Models.ConfigReader;
 import org.prongpa.Models.TaskModel;
-import org.prongpa.Repository.Config.ConfigRepository;
-import org.prongpa.Repository.Config.HibernateConfigRepository;
 import org.prongpa.Repository.Task.HibernateTaskRepository;
 import org.prongpa.Repository.Task.TaskRepository;
 import org.prongpa.Repository.TaskHistory.HibernateTaskHistoryRepository;
 import org.prongpa.Repository.TaskHistory.TaskHistoryRepository;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.*;
 
 @Slf4j
@@ -56,32 +59,48 @@ public class TaskExecuteService implements Runnable{
             stop();
         }
     }
-    public HttpResponse<String> doCurl(String url, String requestBody) {
+    public HttpResponse doCurl(String url, String requestBody) {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-Type", "application/json");
+        httpPost.setEntity(new StringEntity(requestBody, "UTF-8"));
+
         try {
-            HttpClient httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(10))
-                    .build();
+            HttpResponse response = httpClient.execute(httpPost);
+            return response;
+        } catch (Exception e) {
+            System.err.println("Error al realizar la solicitud HTTP: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+    public HttpResponse doHttpGet(String url) {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
 
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.addHeader("Content-Type", "application/json");
 
-            return httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            log.error("Error al realizar la solicitud HTTP: " + e.getMessage());
-            return null;
+        try {
+            HttpResponse response = httpClient.execute(httpGet);
+            return response;
+        } catch (Exception e) {
+            System.err.println("Error al realizar la solicitud HTTP: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
     public boolean update(TaskModel task){
         boolean success = false;
         try{
             String url = "http://" +configReader.getApiAcsUrl() + ":" + configReader.getApiAcsPort() + "/devices/" + task.getIdcompuesto() + "/tasks?timeout=3000&connection_request";
-            String requestBody = "{\"name\": \"download\", \"file\": \"" + task.getFilename() + "\"}";
-            HttpResponse<String> response = doCurl(url, requestBody);
-            String responseBody = response.body();
-            log.info("Respuesta del curl: " + responseBody);
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("name", "download");
+            jsonBody.put("file", task.getFilename());
+            String requestBody = jsonBody.toString();
+            HttpResponse response = doCurl(url, requestBody);
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity, "UTF-8");
+
+            log.info("["+processId+"]Respuesta del curl: " + responseBody);
 
             if (responseBody.toLowerCase().contains("device")) {
                 // Estado exitoso, realizar las acciones correspondientes
@@ -96,7 +115,7 @@ public class TaskExecuteService implements Runnable{
         }catch (Exception e){
             actualizarEstadoLista(this.taskModelList, task.getId(), "E");
             log.error("Error en la funcion Update, MENSAJE: "+e.getMessage() );
-            success=true;
+            success=false;
         }finally {
             return success;
         }
@@ -104,16 +123,16 @@ public class TaskExecuteService implements Runnable{
     public boolean checkStatus(TaskModel taskModel){
         boolean sucess=false;
         try{
-            if(taskModel.getVersion().equals("xml")){
-                log.info("Actualizacion completada para equipo ID task :"+taskModel.getId());
+            if(taskModel.getVersion().equals("xml")||taskModel.getEstado().equals('F')){
+                log.info("["+processId+"]Actualizacion completada para equipo ID task :"+taskModel.getId());
                 taskModel.setEstado("F");
                 sucess=true;
             }else {
                 String url = "http://" + configReader.getApiAcsUrl() + ":" + configReader.getApiAcsPort() + "/devices/?query=%7B%22_id%22%3A%22" + taskModel.getIdcompuesto() + "%22%7D&projection=InternetGatewayDevice.DeviceInfo.SoftwareVersion._value";
-                HttpResponse<String> response = doCurl(url, null);
-                if (response != null && response.statusCode() == 200) {
-                    String responseBody = response.body();
-
+                HttpResponse response = doHttpGet(url);
+                HttpEntity entity = response.getEntity();
+                String responseBody = EntityUtils.toString(entity, "UTF-8");
+                if (response != null && response.getStatusLine().getStatusCode() == 200) {
                     // Evaluar el estado de la respuesta
                     int status = responseBody.toLowerCase().contains("_value") ? 1 : 0;
 
@@ -125,15 +144,16 @@ public class TaskExecuteService implements Runnable{
                         sucess=false;
                     } else {
                         // Comparar la versión de ACS con la versión anterior
-                        String version_actual =""; //obtenerVersionACS(responseBody);
+                        String version_actual =ExtractValue(responseBody);
                         String version_anterior = taskModel.getVersion();
                         sucess=true;
                         if (version_actual.equals(version_anterior)) {
                             // Actualización completa
-                            //log.info("Actualización completa de la task " + taskModel.getId() + ", se moverá a la tabla histórica");
+                            log.info("["+processId+"]Actualización completa de la task " + taskModel.getId() + ", se moverá a la tabla histórica");
                             actualizarEstadoLista(this.taskModelList,taskModel.getId(),"F");
                         }else{
-                            log.info("Aun esta pendiente la Actualización de la task " + taskModel.getId() + ", esperando intervalo de tiempo.");
+                            actualizarEstadoLista(this.taskModelList,taskModel.getId(),"P");
+                            log.info("["+processId+"]Aun esta pendiente la Actualización de la task " + taskModel.getId() + ", esperando intervalo de tiempo.");
                         }
                     }
                 }
@@ -151,11 +171,13 @@ public class TaskExecuteService implements Runnable{
             String url = "http://" + configReader.getApiAcsUrl() + ":" + configReader.getApiAcsPort() + "/devices/" + taskModel.getIdcompuesto() + "/tasks?timeout=3000&connection_request";
             String requestBody = taskModel.getCommands();
 
-            HttpResponse<String> response =  doCurl(url, requestBody);
-            if (response != null && response.statusCode() == 200) {
-                String responseBody = response.body();
-                log.info("Respuesta de la solicitud TR069: " + responseBody);
+            HttpResponse response =  doCurl(url, requestBody);
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity, "UTF-8");
+            if (response != null && response.getStatusLine().getStatusCode()== 200) {
+                log.info("["+processId+"]Respuesta de la solicitud TR069: " + responseBody);
                 // Evaluar la respuesta y determinar si fue exitosa
+                //PENDIENTE para evaluar SEGUN SU CUERPO
                 int result = responseBody.toLowerCase().contains("_value") ? 1 : 0;
 
                 if (result <= 0) {
@@ -164,7 +186,7 @@ public class TaskExecuteService implements Runnable{
                     actualizarEstadoLista(this.taskModelList, taskModel.getId(), "E");
                     sucess=false;
                 } else {
-                    log.info("Provision completa de la task ID:  " + taskModel.getId() + ", se moverá a la tabla historica");
+                    log.info("["+processId+"]Provision completa de la task ID:  " + taskModel.getId() + ", se moverá a la tabla historica");
                     actualizarEstadoLista(this.taskModelList,taskModel.getId(),"F");
                     taskHistoryService.saveByTaskModel(taskModel);
                     taskService.delete(taskModel);
@@ -176,7 +198,7 @@ public class TaskExecuteService implements Runnable{
                 sucess=false;
             }
         }catch (Exception e){
-            log.info("Error en la funcion TR069 MENSAJE: "+e.getMessage());
+            log.info("["+processId+"]Error en la funcion TR069 MENSAJE: "+e.getMessage());
             sucess=false;
         }finally {
             return sucess;
@@ -191,6 +213,14 @@ public class TaskExecuteService implements Runnable{
             }
         }
     }
+    public void ActualizarEstadoTask(List<TaskModel> taskModelList, int id, String nuevoEstado){
+        for (TaskModel task : taskModelList) {
+            if (task.getId() == id) {
+                task.setEstado(nuevoEstado);
+                break; // Se encontró el objeto, se actualiza y se termina el ciclo
+            }
+        }
+    }
     public void actualizarReintentosLista(List<TaskModel> taskModelList, int id, int reintento) {
         for (TaskModel task : taskModelList) {
             if (task.getId() == id) {
@@ -200,9 +230,9 @@ public class TaskExecuteService implements Runnable{
         }
     }
     public void MoveToHistory(){
-        log.info("se procede a mover hacia historico, processId: "+processId);
+        log.info("["+processId+"]se procede a mover hacia historico, processId: "+processId);
         taskHistoryService.saveOfTask(this.taskModelList);
-        //taskService.deleteByProcessId(processId);
+        taskService.deleteByProcessId(processId);
         callBackService.ExecuteCallBack(processId);
     }
 
@@ -210,16 +240,15 @@ public class TaskExecuteService implements Runnable{
     public void run() {
         try {
             while (status){
-                callBackService=new CallBackService(configReader);
-                log.info("Ejecutando Hilo para process_id: "+processId);
                 //actualiza a pendiente los estado para
                 //que no vuelvan a ser consultados en caso que demore su ejecucion de hilo
                 //se trabaja en memoria la lista por hilo para evitar realizar demaciadas consultas.
                 taskService.updateByProcessId(taskModelList);
+                callBackService=new CallBackService(configReader);
+                log.info("["+processId+"]Ejecutando Hilo para process_id: "+processId);
                 for (TaskModel taskModel : taskModelList) {
-
                     if(taskModel.getReintentos()<=configReader.getMaxRetries()){
-                        log.info("actualizando equipo en intento:"+taskModel.getReintentos(),"para el equipo ID Task: "+taskModel.getId());
+                        log.info("["+processId+"]actualizando equipo en intento:"+taskModel.getReintentos(),"para el equipo ID Task: "+taskModel.getId());
                         if(taskModel.getEstado().equals("I")){
                             taskModel.setEstado("P");
                             if(taskModel.getTasktype().equals("TR069")){
@@ -235,7 +264,8 @@ public class TaskExecuteService implements Runnable{
                                     break;
                                 }
                             }
-                            Thread.sleep(configReader.getTimeout());
+                            log.info("["+processId+"]Esperando tiempo de actualizacion para task ID: "+taskModel.getId()+", process_id: "+processId);
+                            //Thread.sleep(configReader.getTimeout());
                             break;
                         }else{
                             if(!checkStatus(taskModel)){
@@ -244,14 +274,23 @@ public class TaskExecuteService implements Runnable{
                                 break;
                             }
                             if(taskModel.getEstado()!="F"){
-                                Thread.sleep(configReader.getTimeout());
+                                log.info("["+processId+"]Esperando tiempo de actualizacion para task ID: "+taskModel.getId()+", process_id: "+processId);
+                                //Thread.sleep(configReader.getTimeout());
+                                break;
                             }else{
-                                log.info("Tarea completada para task ID: "+taskModel.getId()+", process_id: "+processId);
+                                log.info("["+processId+"]Tarea completada para task ID: "+taskModel.getId()+", process_id: "+processId);
+                                taskHistoryService.saveTask(taskModel);
                                 taskModelList.remove(taskModel);
+                                if(taskModelList.isEmpty()){
+                                    MoveToHistory();
+                                    stop();
+                                }
+                                break;
                             }
                         }
                     }else{
-                        log.info("Reintentos maximo alcanzado para task: "+taskModel.getId()+", process_id: "+processId);
+                        log.info("["+processId+"]Reintentos maximo alcanzado para task: "+taskModel.getId()+", process_id: "+processId);
+                        ActualizarEstadoTask(this.taskModelList, taskModel.getId(), "E");
                         MoveToHistory();
                         stop();
                         break;
@@ -262,12 +301,12 @@ public class TaskExecuteService implements Runnable{
             stop();
             log.error("Error al ejecutar el process_id: "+processId+", MENSAJE: "+e.getMessage());
         }finally {
-            log.info("Proceso Terminado, process_id: "+processId);
+            log.info("["+processId+"]Proceso Terminado, process_id: "+processId);
             ThreadManagerService.threadCount.decrementAndGet();
         }
     }
     private void whenError(){
-        log.info("se procede a mover hacia historico, processId: "+processId);
+        log.info("["+processId+"]se procede a mover hacia historico, processId: "+processId);
         taskHistoryService.saveOfTask(this.taskModelList);
         taskService.deleteByProcessId(processId);
         callBackService.ExecuteCallBack(processId);
@@ -278,5 +317,21 @@ public class TaskExecuteService implements Runnable{
     }
     public void start(){
         status=true;
+    }
+    private String ExtractValue(String response){
+        try {
+            JSONArray jsonArray = new JSONArray(response);
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+            JSONObject softwareVersion = jsonObject.getJSONObject("InternetGatewayDevice")
+                    .getJSONObject("DeviceInfo")
+                    .getJSONObject("SoftwareVersion");
+
+            String value = softwareVersion.getString("_value");
+            return value;
+        } catch (Exception e) {
+            System.err.println("Error al procesar la respuesta JSON: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

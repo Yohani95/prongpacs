@@ -58,15 +58,25 @@ public class ThreadManagerService implements Runnable {
             return false;
         }
     }
+    private void ReloadConfig(){
+        ConfigRepository configRepository=new HibernateConfigRepository(sessionFactory);
+        ConfigServices configServices=new ConfigServices(configRepository);
+        configDBModel=configServices.GetConfig();
+        configReader.setTimeout(Integer.parseInt(configDBModel.getAcsRestartTime())* 60 * 1000);
+        configReader.setMaxThreads(Integer.parseInt(configDBModel.getMaxThreads()));
+        configReader.setMaxRetries(Integer.parseInt(configDBModel.getMaxReintentos()));
+    }
 
     public void run() {
         while (status) {
             try {
-            if(configReader.getMaxThreads()<=getThreadCount()){
-                log.info("Hilos maximo alcanzado esperando que decremente. HILOS: "+getThreadCount());
-                Thread.sleep(configReader.getTimeout()); // Esperar el intervalo de tiempo especificado
-            }
+                ReloadConfig();
             log.info("Buscando tareas activas");
+                if(configReader.getMaxThreads()<=threadCount.get()){
+                    log.info("Hilos maximo alcanzado esperando que decremente. HILOS: "+getThreadCount());
+                    Thread.sleep(configReader.getTimeout()); // Esperar el intervalo de tiempo especificado
+                    break;
+                }
             // Consultar la base de datos para obtener las tareas activas
             List<TaskModel> activeTasks = taskService.findByEstado("I");
             if(activeTasks.isEmpty()){
@@ -74,7 +84,7 @@ public class ThreadManagerService implements Runnable {
                 log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: "+configReader.getTimeout()/(60*1000)+" minutos");
                 Thread.sleep(configReader.getTimeout());
             }else {
-                // Crear un HashMap para agrupar las tareas por process_id
+                // Crear un HashMap para agrupar las tareas por process_id+
                 HashMap<String, List<TaskModel>> taskMap = new HashMap<>();
 
                 // Aislar las tareas por process_id
@@ -90,13 +100,19 @@ public class ThreadManagerService implements Runnable {
                 for (List<TaskModel> batch : taskBatches) {
                     Collections.sort(batch, Comparator.comparingInt(TaskModel::getOrderTask));
                 }
+
                 // Crear un hilo para cada tarea activa4
                 for (Map.Entry<String, List<TaskModel>> entry : taskMap.entrySet()) {
                     String processId = entry.getKey();
                     List<TaskModel> taskList = entry.getValue();
-                    Thread taskThread = new Thread(new TaskExecuteService(taskList, configReader, processId));
-                    taskThread.start();
-                    threadCount.incrementAndGet(); // Incrementar el contador de hilos
+                    if(configReader.getMaxThreads()<=threadCount.get()){
+                        log.info("Hilos maximo alcanzado esperando que decremente. HILOS: "+getThreadCount());
+                        break;
+                    }else{
+                        Thread taskThread = new Thread(new TaskExecuteService(taskList, configReader, processId));
+                        taskThread.start();
+                        threadCount.incrementAndGet();
+                    }
                 }
                 log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: "+configReader.getWaitProcess()/(60*1000)+" minutos");
                 log.info("Hilos trabajando actualmente: "+getThreadCount());

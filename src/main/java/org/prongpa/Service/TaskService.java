@@ -45,6 +45,9 @@ public class TaskService {
     public List<TaskModel> findByEstado(String firstStatus){
         return taskRepository.findByEstado(firstStatus);
     }
+    public List<TaskModel> findByAll(){
+        return taskRepository.findAll();
+    }
     public void updateByProcessId(List<TaskModel> tasks){
         List<TaskModel> listTasks=new ArrayList<>(tasks);
         for (TaskModel task: listTasks){

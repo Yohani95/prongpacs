@@ -16,7 +16,7 @@ public class TaskHistoryModel {
     private Date lastDate;
     // @Column(name = "`process_id`")
     private String process_id;
-    private int thread_id;
+    private Integer thread_id;
     private String model;
     private int reintentos;
     private String version;
@@ -29,4 +29,5 @@ public class TaskHistoryModel {
     private String commands;
     @Column(name = "`order`")
     private int orderTask;
+    private String mercado;
 }

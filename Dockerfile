@@ -28,3 +28,4 @@ RUN mkdir /app/logs
 
 # Comando para ejecutar el JAR
 CMD ["java", "-jar", "prongpacs.jar"]
+EXPOSE 8085

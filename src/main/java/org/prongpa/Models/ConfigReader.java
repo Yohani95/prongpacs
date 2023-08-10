@@ -21,6 +21,7 @@ public class ConfigReader {
     private String userSession;
     private String passwordSession;
     private int sessionIdTime;
+    private int timeoutCurl;
     public boolean loadConfig() {
         Properties properties = new Properties();
         try {
@@ -30,7 +31,7 @@ public class ConfigReader {
             properties.load(inputStream);
             inputStream.close();
             // Leer los valores del archivo de configuración
-            timeout = Integer.parseInt(properties.getProperty("timeout")) * 60 * 1000;
+            timeout = Integer.parseInt(properties.getProperty("waitProcessThreads")) * 60 * 1000;
             maxThreads = Integer.parseInt(properties.getProperty("maxThreads"));
             maxRetries = Integer.parseInt(properties.getProperty("maxRetries"));
             apiAcsUrl = properties.getProperty("APIACS.url");
@@ -43,6 +44,7 @@ public class ConfigReader {
             urlSession = properties.getProperty("URL_SESSION_ID");
             userSession=properties.getProperty("USER_SESSION");
             passwordSession=properties.getProperty("PASSWORD_SESSION");
+            timeoutCurl=Integer.parseInt(properties.getProperty("timeoutCurl"));
             return true;
         } catch (IOException e) {
             log.error("Error Al leer Configuracion MENSAJE: "+ e.getMessage());

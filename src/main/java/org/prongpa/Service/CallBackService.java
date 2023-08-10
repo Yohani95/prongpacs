@@ -17,6 +17,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import java.io.StringReader;
 @Slf4j
 public class CallBackService {
     private Map<String, LocalDateTime> sessionIdMap = new HashMap<>();
@@ -120,7 +128,7 @@ public class CallBackService {
 
         try {
             LocalDateTime timestamp = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
             Map<String, Object> params = new HashMap<>();
             params.put("SessionId", sessionId);
@@ -136,14 +144,16 @@ public class CallBackService {
 
             // Realiza la solicitud SOAP utilizando la función genérica doSoapRequest
             HttpResponse<String> soapResponse = doSoapRequest(this.config.getUrlCallBack(), soapBody);
-
-            if(soapResponse.statusCode()==200){
-                log.info("Notificacion enviada con exito respuesta: " +soapResponse.body());
-            } else if (soapResponse.statusCode()==1010) {
-                log.info("Error al enviar Notificacion, code: "+soapResponse.statusCode()+" respuesta: " +soapResponse.body());
+            String code=extractTagValue(soapResponse.body(),"errorcode");
+            if(code.equals("1097")){
+                log.info("["+processId+"]Error al enviar Notificacion, codeRequest: "+soapResponse.statusCode()+", codeError: "+extractTagValue(soapResponse.body(),"errorcode")+", Detalles: " +extractTagValue(soapResponse.body(),"errormessage"));
+            } else if (code.equals("1010")) {
+                log.info("["+processId+"]Error al enviar Notificacion, codeRequest: "+soapResponse.statusCode()+", codeError: "+extractTagValue(soapResponse.body(),"errorcode") +", Detalles: " +extractTagValue(soapResponse.body(),"errormessage"));
+            }else{
+                log.info("["+processId+"]Notificacion enviada con exito codeRequest: " +soapResponse.statusCode());
             }
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.info("["+processId+"]Error al en la funcion Callback, mensaje: "+e.getMessage());
         }
         return response;
     }
@@ -165,30 +175,43 @@ public class CallBackService {
     }
     private String buildSoapRequestBody(Map<String, Object> params) {
         String soapBody = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-                "xmlns:cai3=\"http://schemas.ericsson.com/cai3g1.2/\">\n" +
+                "xmlns:cai3=\"http://schemas.ericsson.com/cai3g1.2/\" xmlns:ent=\"http://schemas.ericsson.com/ma/CA/EntelB2CFTTHMultiRed/\">\n" +
                 "   <soapenv:Header>\n" +
-                "       <cai:SessionId>" + params.get("SessionId") + "</cai3:SessionId>\n" +
+                "      <cai3:SessionId>"+params.get("SessionId")+"</cai3:SessionId>\n" +
                 "   </soapenv:Header>\n" +
                 "   <soapenv:Body>\n" +
-                "       <cai3:set>\n" +
-                "           <cai3:MOType></cai3:MOType>\n" +
-                "           <cai3:MOId>\n" +
-                "               <ent:processId>" + params.get("PROCESS_ID") + "</ent:processId>\n" +
-                "           </cai3:MOId>\n" +
-                "           <cai3:MOAttributes>\n" +
-                "               <ent:SetFTTHSubscriber>\n" +
-                "                   <ent:GenieCallBack>\n" +
-                "                       <ent:PROCESS_ID>" + params.get("PROCESS_ID") + "</ent:PROCESS_ID>\n" +
-                "                       <ent:CODIGO_ERROR>" + params.get("CODIGO_ERROR") + "</ent:CODIGO_ERROR>\n" +
-                "                       <ent:DESCRIPCION_ERROR>" + params.get("DESCRIPCION_ERROR") + "</ent:DESCRIPCION_ERROR>\n" +
-                "                       <ent:DETALLE_ERROR>" + params.get("DETALLE_ERROR") + "</ent:DETALLE_ERROR>\n" +
-                "                       <ent:TIMESTAMP>" + params.get("TIMESTAMP") + "</ent:TIMESTAMP>\n" +
-                "                   </ent:GenieCallBack>\n" +
-                "               </ent:SetFTTHSubscriber>\n" +
-                "           </cai3:MOAttributes>\n" +
-                "       </cai3:set>\n" +
+                "      <cai3:Set>\n" +
+                "         <cai3:MOType>EntelB2CFTTHMultiRed@http://schemas.ericsson.com/ma/CA/EntelB2CFTTHMultiRed/</cai3:MOType>\n" +
+                "         <cai3:MOAttributes>\n" +
+                "            <ent:SetFTTHSubscriber>\n" +
+                "               <ent:actionId>?</ent:actionId>\n" +
+                "               <!--Optional:-->\n" +
+                "               <ent:GenieCallBack>\n" +
+                "                  <ent:PROCESS_ID>"+ params.get("PROCESS_ID") +"</ent:PROCESS_ID>\n" +
+                "                  <ent:CODIGO_ERROR>"+params.get("CODIGO_ERROR")+"</ent:CODIGO_ERROR>\n" +
+                "                  <ent:DESCRIPCION_ERROR>"+params.get("DESCRIPCION_ERROR")+"</ent:DESCRIPCION_ERROR>\n" +
+                "                  <ent:DETALLE_ERROR>"+params.get("DETALLE_ERROR")+"</ent:DETALLE_ERROR>\n" +
+                "                  <ent:TIMESTAMP>" + params.get("TIMESTAMP") + "</ent:TIMESTAMP>\n" +
+                "               </ent:GenieCallBack>\n" +
+                "            </ent:SetFTTHSubscriber>\n" +
+                "         </cai3:MOAttributes>\n" +
+                "      </cai3:Set>\n" +
                 "   </soapenv:Body>\n" +
                 "</soapenv:Envelope>";
         return soapBody;
+    }
+    public String extractTagValue(String soapResponse, String tagName) {
+        // Define el patrón de expresión regular para buscar el tag especificado
+        String pattern = "<" + tagName + ">(.*?)</" + tagName + ">";
+
+        // Crea el objeto Pattern y Matcher para buscar el patrón en la respuesta XML
+        Pattern tagPattern = Pattern.compile(pattern);
+        Matcher matcher = tagPattern.matcher(soapResponse);
+
+        // Encuentra la primera coincidencia y extrae el valor del tag
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }
