@@ -265,7 +265,7 @@ public class TaskExecuteService implements Runnable{
                                 }
                             }
                             log.info("["+processId+"]Esperando tiempo de actualizacion para task ID: "+taskModel.getId()+", process_id: "+processId);
-                            //Thread.sleep(configReader.getTimeout());
+                            Thread.sleep(configReader.getTimeout());
                             break;
                         }else{
                             if(!checkStatus(taskModel)){
@@ -275,7 +275,7 @@ public class TaskExecuteService implements Runnable{
                             }
                             if(taskModel.getEstado()!="F"){
                                 log.info("["+processId+"]Esperando tiempo de actualizacion para task ID: "+taskModel.getId()+", process_id: "+processId);
-                                //Thread.sleep(configReader.getTimeout());
+                                Thread.sleep(configReader.getTimeout());
                                 break;
                             }else{
                                 log.info("["+processId+"]Tarea completada para task ID: "+taskModel.getId()+", process_id: "+processId);

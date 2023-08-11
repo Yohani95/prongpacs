@@ -71,11 +71,11 @@ public class ThreadManagerService implements Runnable {
         while (status) {
             try {
                 ReloadConfig();
-            log.info("Buscando tareas activas");
+                log.info("Buscando tareas activas");
                 if(configReader.getMaxThreads()<=threadCount.get()){
                     log.info("Hilos maximo alcanzado esperando que decremente. HILOS: "+getThreadCount());
                     Thread.sleep(configReader.getTimeout()); // Esperar el intervalo de tiempo especificado
-                    break;
+                    continue;
                 }
             // Consultar la base de datos para obtener las tareas activas
             List<TaskModel> activeTasks = taskService.findByEstado("I");
@@ -119,9 +119,15 @@ public class ThreadManagerService implements Runnable {
                 Thread.sleep(configReader.getWaitProcess()); // Esperar el intervalo de tiempo especificado para que se vuelvan a consultar las tareas
             }
             } catch (InterruptedException e) {
-                log.info("Error mientras se ejecutaba el hilo padre MENSAJE: "+e.getMessage());
-                log.info("Se procede a detener el servicio");
+                log.error("Error mientras se ejecutaba el hilo padre MENSAJE: "+e.getMessage());
                 stop();
+            }catch (Exception e){
+                log.error("Error al obtener informacion BBDD,  : "+e.getMessage());
+                try {
+                    Thread.sleep(6000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
     }

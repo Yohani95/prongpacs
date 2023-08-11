@@ -34,13 +34,33 @@ public class CallBackService {
     }
     public  void ExecuteCallBack( String processId){
         try{
-            String sessionId=createSessionId();
-            if(sessionId!=null){
-             sendGenieCallBack(sessionId,processId,"0") ;
+            LocalDateTime currentTime = LocalDateTime.now();
+            String sessionId = getSessionIdOrGenerate(currentTime);
+            if (sessionId != null) {
+                sendGenieCallBack(sessionId, processId, "0");
             }
         }catch (Exception e){
             log.info("Error al Ejecutar ExecuteCallBack :"+e.getMessage());
         }
+    }
+    private String getSessionIdOrGenerate(LocalDateTime currentTime) {
+        String existingSessionId = null;
+        for (Map.Entry<String, LocalDateTime> entry : sessionIdMap.entrySet()) {
+            existingSessionId = entry.getKey();
+            LocalDateTime sessionTime = entry.getValue();
+
+            LocalDateTime thirtyMinutesAgo = currentTime.minusMinutes(30);
+            if (sessionTime.isAfter(thirtyMinutesAgo)) {
+                log.info("Aun Es valido el SessionID");
+                // Si el tiempo de la sesión actual es menor a 30 minutos atrás, se reutiliza la sesión
+                return existingSessionId;
+            }
+        }
+
+        // Si no existe una sesión válida o ha pasado más de 30 minutos, se crea una nueva
+        String newSessionId = createSessionId();
+        sessionIdMap.put(newSessionId, currentTime);
+        return newSessionId;
     }
     public HttpResponse<String> doSoapRequest(String url, String soapBody) {
         try {
@@ -108,14 +128,12 @@ public class CallBackService {
                 return sessionId;
             } else {
                 log.info("SessionId caducada");
-                // Realizar las acciones necesarias cuando el sessionId ha caducado,
-                // en este caso se elimina del hash
+                sessionId=createSessionId();
                 sessionIdMap.remove(sessionId);
                 return sessionId;
             }
         } else {
             log.info("SessionId no encontrado");
-            // Realizar las acciones necesarias cuando el sessionId no existe en el HashMap
         }
 
         return null;
