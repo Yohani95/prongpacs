@@ -1,4 +1,5 @@
 package org.prongpa.Models;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -26,8 +27,7 @@ public class ConfigReader {
         Properties properties = new Properties();
         try {
             log.info("Cargando Configuracion");
-            ClassLoader classLoader = getClass().getClassLoader();
-            InputStream inputStream = classLoader.getResourceAsStream("config.properties");
+            FileInputStream inputStream = new FileInputStream("config.properties");
             properties.load(inputStream);
             inputStream.close();
             // Leer los valores del archivo de configuración

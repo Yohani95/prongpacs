@@ -1,6 +1,5 @@
 package org.prongpa.Service;
 
-import com.mysql.cj.log.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -14,6 +13,8 @@ import org.prongpa.Repository.Task.TaskRepository;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.prongpa.Repository.Hibernate.HibernateUtil.getSessionFactory;
 
 @Slf4j
 public class ThreadManagerService implements Runnable {
@@ -37,19 +38,22 @@ public class ThreadManagerService implements Runnable {
     public boolean configure(){
         try{
             log.info("Iniciando y cargando configuracion de Hilo padre");
-            Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
-            sessionFactory = configuration.buildSessionFactory();
+            //Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
+            log.info("cargando configuracion de Hibernate BBDD");
+            sessionFactory = getSessionFactory();
             // Crear una instancia del repositorio HibernateTaskRepository
             taskRepository = new HibernateTaskRepository(sessionFactory);
             taskService=new TaskService(taskRepository);
-
+            log.info("sesion nueva para configuracion en bbdd");
             //sesion nueva para configuracion en bbdd
             ConfigRepository configRepository=new HibernateConfigRepository(sessionFactory);
             ConfigServices configServices=new ConfigServices(configRepository);
+            log.info("Obteniendo Configuracion de bbdd");
             configDBModel=configServices.GetConfig();
             configReader.setTimeout(Integer.parseInt(configDBModel.getAcsRestartTime())* 60 * 1000);
             configReader.setMaxThreads(Integer.parseInt(configDBModel.getMaxThreads()));
             configReader.setMaxRetries(Integer.parseInt(configDBModel.getMaxReintentos()));
+            log.info("Configuracion cargada Correctamente de hilo padre");
             start();
             return true;
         }catch (Exception e){

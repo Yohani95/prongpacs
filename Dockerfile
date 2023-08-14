@@ -23,9 +23,21 @@ WORKDIR /app
 # Copia el archivo JAR desde la imagen anterior
 COPY --from=builder /app/target/prongpacs*.jar ./prongpacs.jar
 
-# Crea la carpeta "logs" dentro del contenedor
-RUN mkdir /app/logs
+# Copia los archivos de configuración
+COPY config.properties /app/config.properties
+COPY hibernate.cfg.xml /app/hibernate.cfg.xml
 
-# Comando para ejecutar el JAR
-CMD ["java", "-jar", "prongpacs.jar"]
+# Crea la carpeta "logs" dentro del contenedor
+RUN mkdir /app/logs && \
+    chmod -R 777 /app
+
+# Copia el script de entrada personalizado
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Configura el ENTRYPOINT para ejecutar el script de entrada personalizado
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Cambia al usuario no privilegiado (UID 1001) después de configurar todo
+USER 1001
 EXPOSE 8085

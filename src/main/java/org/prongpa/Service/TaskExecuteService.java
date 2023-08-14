@@ -1,6 +1,5 @@
 package org.prongpa.Service;
 
-import com.mysql.cj.xdevapi.JsonArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,8 +21,9 @@ import org.prongpa.Repository.Task.TaskRepository;
 import org.prongpa.Repository.TaskHistory.HibernateTaskHistoryRepository;
 import org.prongpa.Repository.TaskHistory.TaskHistoryRepository;
 
-import java.io.IOException;
 import java.util.*;
+
+import static org.prongpa.Repository.Hibernate.HibernateUtil.getSessionFactory;
 
 @Slf4j
 public class TaskExecuteService implements Runnable{
@@ -46,8 +46,8 @@ public class TaskExecuteService implements Runnable{
     }
     public void configure(){
         try {
-            Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
-            sessionFactory = configuration.buildSessionFactory();
+            //Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
+            sessionFactory = getSessionFactory();
             // Crear una instancia del repositorio HibernateTaskRepository
             taskRepository = new HibernateTaskRepository(sessionFactory);
             taskService=new TaskService(taskRepository);
