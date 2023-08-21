@@ -4,9 +4,9 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://mariadb-prov:3306/acsgpon</property>
-        <property name="hibernate.connection.username">admin</property>
-        <property name="hibernate.connection.password">WS3nt3l*3Cs*321</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:7074/acsgpon</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">allware123</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
         <property name="hibernate.hbm2ddl.auto">validate</property>
         <!-- Otras propiedades de configuracion -->

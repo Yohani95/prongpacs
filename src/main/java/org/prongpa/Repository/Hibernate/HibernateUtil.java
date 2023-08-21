@@ -22,7 +22,7 @@ public class HibernateUtil {
             return configuration.buildSessionFactory();
         } catch (Throwable ex) {
             log.error("Error en la Conexion base de datos MENSAJE:"+ex.getMessage());
-            throw new ExceptionInInitializerError(ex);
+           return null;
         }
     }
 

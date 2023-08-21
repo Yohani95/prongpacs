@@ -31,13 +31,5 @@ COPY hibernate.cfg.xml /app/hibernate.cfg.xml
 RUN mkdir /app/logs && \
     chmod -R 777 /app
 
-# Copia el script de entrada personalizado
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
-# Configura el ENTRYPOINT para ejecutar el script de entrada personalizado
-ENTRYPOINT ["/app/entrypoint.sh"]
-
-# Cambia al usuario no privilegiado (UID 1001) después de configurar todo
+CMD ["sh", "-c", "java -jar prongpacs.jar && sleep infinity"]
 USER 1001
-EXPOSE 8085

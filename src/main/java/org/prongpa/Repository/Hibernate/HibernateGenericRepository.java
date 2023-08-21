@@ -42,6 +42,24 @@ public abstract class HibernateGenericRepository<T, ID> implements GenericReposi
     }
 
     @Override
+    public boolean update(T entity) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        boolean status=false;
+        try {
+            session.update(entity);
+            transaction.commit();
+            status=true;
+        } catch (Exception e) {
+            transaction.rollback();
+            throw e;
+        } finally {
+            session.close();
+            return status;
+        }
+    }
+
+    @Override
     public T findById(ID id) {
         Session session = sessionFactory.openSession();
         try {

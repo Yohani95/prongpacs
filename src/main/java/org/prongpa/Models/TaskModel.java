@@ -30,5 +30,6 @@ public class TaskModel {
     private String commands;
     @Column(name = "`order`")
     private int orderTask;
+    @Column(nullable = true)
     private String mercado;
 }

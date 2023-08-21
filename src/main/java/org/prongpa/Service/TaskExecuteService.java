@@ -10,10 +10,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.prongpa.Models.ConfigDBModel;
 import org.prongpa.Models.ConfigReader;
 import org.prongpa.Models.TaskModel;
 import org.prongpa.Repository.Task.HibernateTaskRepository;
@@ -26,39 +24,39 @@ import java.util.*;
 import static org.prongpa.Repository.Hibernate.HibernateUtil.getSessionFactory;
 
 @Slf4j
-public class TaskExecuteService implements Runnable{
+public class TaskExecuteService implements Runnable {
     private Boolean status;
     private ConfigReader configReader;
     private SessionFactory sessionFactory;
-    private List<TaskModel> taskModelList;
     private TaskRepository taskRepository;
     private TaskService taskService;
     private TaskHistoryService taskHistoryService;
     private TaskHistoryRepository taskHistoryRepository;
     private String processId;
-    private ConfigDBModel configDBModel;
-    CallBackService  callBackService;
-    public TaskExecuteService(List<TaskModel> taskModellist, ConfigReader configReader, String processId) {
-        this.taskModelList = taskModellist;
+    private TaskModel taskModel;
+    CallBackService callBackService;
+
+    public TaskExecuteService(ConfigReader configReader) {
         this.configReader = configReader;
-        this.processId = processId;
         configure();
     }
-    public void configure(){
+
+    public void configure() {
         try {
             //Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
             sessionFactory = getSessionFactory();
             // Crear una instancia del repositorio HibernateTaskRepository
             taskRepository = new HibernateTaskRepository(sessionFactory);
-            taskService=new TaskService(taskRepository);
-            taskHistoryRepository =new HibernateTaskHistoryRepository(sessionFactory);
-            taskHistoryService=new TaskHistoryService(taskHistoryRepository);
+            taskService = new TaskService(taskRepository);
+            taskHistoryRepository = new HibernateTaskHistoryRepository(sessionFactory);
+            taskHistoryService = new TaskHistoryService(taskHistoryRepository);
             start();
-        }catch (Exception e){
-            log.error("Error a cargar configuracion del subhilo Mensaje :"+e.getMessage());
+        } catch (Exception e) {
+            log.error("Error a cargar configuracion del subhilo Mensaje :" + e.getMessage());
             stop();
         }
     }
+
     public HttpResponse doCurl(String url, String requestBody) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
@@ -74,6 +72,7 @@ public class TaskExecuteService implements Runnable{
             throw new RuntimeException(e);
         }
     }
+
     public HttpResponse doHttpGet(String url) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
@@ -88,10 +87,11 @@ public class TaskExecuteService implements Runnable{
             throw new RuntimeException(e);
         }
     }
-    public boolean update(TaskModel task){
+
+    public boolean update(TaskModel task) {
         boolean success = false;
-        try{
-            String url = "http://" +configReader.getApiAcsUrl() + ":" + configReader.getApiAcsPort() + "/devices/" + task.getIdcompuesto() + "/tasks?timeout=3000&connection_request";
+        try {
+            String url = "http://" + configReader.getApiAcsUrl() + ":" + configReader.getApiAcsPort() + "/devices/" + task.getIdcompuesto() + "/tasks?timeout=3000&connection_request";
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("name", "download");
             jsonBody.put("file", task.getFilename());
@@ -100,34 +100,35 @@ public class TaskExecuteService implements Runnable{
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity, "UTF-8");
 
-            log.info("["+processId+"]Respuesta del curl: " + responseBody);
+            log.info("[" + processId + "]Respuesta del curl: " + responseBody);
 
             if (responseBody.toLowerCase().contains("device")) {
                 // Estado exitoso, realizar las acciones correspondientes
-                actualizarEstadoLista(this.taskModelList,task.getId(),"P");
+                actualizarEstadoLista("P");
                 success = true;
             } else {
                 // Error, realizar las acciones correspondientes
-                success=false;
-                actualizarEstadoLista(this.taskModelList, task.getId(), "E");
+                success = false;
+                actualizarEstadoLista( "E");
                 log.error("Error al actualizar el equipo " + task.getId() + " a la versión " + task.getVersion());
             }
-        }catch (Exception e){
-            actualizarEstadoLista(this.taskModelList, task.getId(), "E");
-            log.error("Error en la funcion Update, MENSAJE: "+e.getMessage() );
-            success=false;
-        }finally {
+        } catch (Exception e) {
+            actualizarEstadoLista("E");
+            log.error("Error en la funcion Update, MENSAJE: " + e.getMessage());
+            success = false;
+        } finally {
             return success;
         }
     }
-    public boolean checkStatus(TaskModel taskModel){
-        boolean sucess=false;
-        try{
-            if(taskModel.getVersion().equals("xml")||taskModel.getEstado().equals('F')){
-                log.info("["+processId+"]Actualizacion completada para equipo ID task :"+taskModel.getId());
+
+    public boolean checkStatus(TaskModel taskModel) {
+        boolean sucess = false;
+        try {
+            if (taskModel.getVersion().equals("xml") || taskModel.getEstado().equals('F')) {
+                log.info("[" + processId + "]Actualizacion completada para equipo ID task :" + taskModel.getId());
                 taskModel.setEstado("F");
-                sucess=true;
-            }else {
+                sucess = true;
+            } else {
                 String url = "http://" + configReader.getApiAcsUrl() + ":" + configReader.getApiAcsPort() + "/devices/?query=%7B%22_id%22%3A%22" + taskModel.getIdcompuesto() + "%22%7D&projection=InternetGatewayDevice.DeviceInfo.SoftwareVersion._value";
                 HttpResponse response = doHttpGet(url);
                 HttpEntity entity = response.getEntity();
@@ -135,47 +136,48 @@ public class TaskExecuteService implements Runnable{
                 if (response != null && response.getStatusLine().getStatusCode() == 200) {
                     // Evaluar el estado de la respuesta
                     int status = responseBody.toLowerCase().contains("_value") ? 1 : 0;
-
                     if (status <= 0) {
                         // No se encontró el equipo en genieacs
                         log.error("Error No se pudo encontrar el equipo " + taskModel.getIdcompuesto() + " en genieacs, no se actualizará");
                         log.error("Respuesta: " + responseBody);
-                        actualizarEstadoLista(this.taskModelList,taskModel.getId(),"E");
-                        sucess=false;
+                        actualizarEstadoLista( "E");
+                        sucess = false;
                     } else {
                         // Comparar la versión de ACS con la versión anterior
-                        String version_actual =ExtractValue(responseBody);
+                        String version_actual = ExtractValue(responseBody);
                         String version_anterior = taskModel.getVersion();
-                        sucess=true;
+                        sucess = true;
                         if (version_actual.equals(version_anterior)) {
                             // Actualización completa
-                            log.info("["+processId+"]Actualización completa de la task " + taskModel.getId() + ", se moverá a la tabla histórica");
-                            actualizarEstadoLista(this.taskModelList,taskModel.getId(),"F");
-                        }else{
-                            actualizarEstadoLista(this.taskModelList,taskModel.getId(),"P");
-                            log.info("["+processId+"]Aun esta pendiente la Actualización de la task " + taskModel.getId() + ", esperando intervalo de tiempo.");
+                            log.info("[" + processId + "]Actualización completa de la task " + taskModel.getId() + ", se moverá a la tabla histórica");
+                            actualizarEstadoLista( "F");
+                        } else {
+                            actualizarEstadoLista( "P");
+                            log.info("[" + processId + "]Aun esta pendiente la Actualización de la task " + taskModel.getId() + ", esperando intervalo de tiempo.");
                         }
                     }
                 }
             }
-        }catch (Exception e){
-            sucess=false;
-            actualizarEstadoLista(this.taskModelList,taskModel.getId(),"E");
-        }finally {
+        } catch (Exception e) {
+            sucess = false;
+            actualizarEstadoLista( "E");
+        } finally {
             return sucess;
         }
     }
-    public boolean TR069(TaskModel taskModel){
-        boolean sucess=false;
-        try{
+
+    public boolean TR069(TaskModel taskModel) {
+        boolean sucess = false;
+        try {
             String url = "http://" + configReader.getApiAcsUrl() + ":" + configReader.getApiAcsPort() + "/devices/" + taskModel.getIdcompuesto() + "/tasks?timeout=3000&connection_request";
             String requestBody = taskModel.getCommands();
 
-            HttpResponse response =  doCurl(url, requestBody);
+            HttpResponse response = doCurl(url, requestBody);
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity, "UTF-8");
-            if (response != null && response.getStatusLine().getStatusCode()== 200) {
-                log.info("["+processId+"]Respuesta de la solicitud TR069: " + responseBody);
+            log.info("Respuesta de HTTP, TR069: " + responseBody + "HEADER: " + response.getStatusLine().getStatusCode());
+            if (response != null && response.getStatusLine().getStatusCode() == 200) {
+                log.info("[" + processId + "]Respuesta de la solicitud TR069: " + responseBody);
                 // Evaluar la respuesta y determinar si fue exitosa
                 //PENDIENTE para evaluar SEGUN SU CUERPO
                 int result = responseBody.toLowerCase().contains("_value") ? 1 : 0;
@@ -183,142 +185,100 @@ public class TaskExecuteService implements Runnable{
                 if (result <= 0) {
                     log.error("Error: No se pudo provisionar el equipo en ACS");
                     log.error("Respuesta: " + responseBody);
-                    actualizarEstadoLista(this.taskModelList, taskModel.getId(), "E");
-                    sucess=false;
+                    actualizarEstadoLista( "E");
+                    sucess = false;
                 } else {
-                    log.info("["+processId+"]Provision completa de la task ID:  " + taskModel.getId() + ", se moverá a la tabla historica");
-                    actualizarEstadoLista(this.taskModelList,taskModel.getId(),"F");
+                    log.info("[" + processId + "]Provision completa de la task ID:  " + taskModel.getId() + ", se moverá a la tabla historica");
+                    actualizarEstadoLista( "F");
                     taskHistoryService.saveByTaskModel(taskModel);
                     taskService.delete(taskModel);
-                    sucess=true;
+                    sucess = true;
                 }
             } else {
                 log.error("Error al realizar peticion HTTP para la tarea task: " + taskModel.getId());
-                actualizarEstadoLista(this.taskModelList,taskModel.getId(),"E");
-                sucess=false;
+                actualizarEstadoLista("E");
+                sucess = false;
             }
-        }catch (Exception e){
-            log.info("["+processId+"]Error en la funcion TR069 MENSAJE: "+e.getMessage());
-            sucess=false;
-        }finally {
+        } catch (Exception e) {
+            log.info("[" + processId + "]Error en la funcion TR069 MENSAJE: " + e.getMessage());
+            sucess = false;
+        } finally {
             return sucess;
         }
     }
-    public void actualizarEstadoLista(List<TaskModel> taskModelList, int id, String nuevoEstado) {
-        for (TaskModel task : taskModelList) {
-            if (task.getId() == id) {
-                task.setEstado(nuevoEstado);
-                task.setReintentos(task.getReintentos()+1);
-                break; // Se encontró el objeto, se actualiza y se termina el ciclo
-            }
-        }
+
+    public void actualizarEstadoLista(String nuevoEstado) {
+        long currentTime = System.currentTimeMillis();
+        taskModel.setLastDate(new Date(currentTime));
+        taskModel.setEstado(nuevoEstado);
+        taskRepository.update(taskModel);
     }
-    public void ActualizarEstadoTask(List<TaskModel> taskModelList, int id, String nuevoEstado){
-        for (TaskModel task : taskModelList) {
-            if (task.getId() == id) {
-                task.setEstado(nuevoEstado);
-                break; // Se encontró el objeto, se actualiza y se termina el ciclo
-            }
-        }
-    }
-    public void actualizarReintentosLista(List<TaskModel> taskModelList, int id, int reintento) {
-        for (TaskModel task : taskModelList) {
-            if (task.getId() == id) {
-                task.setReintentos(reintento);
-                break; // Se encontró el objeto, se actualiza y se termina el ciclo
-            }
-        }
-    }
-    public void MoveToHistory(){
-        log.info("["+processId+"]se procede a mover hacia historico, processId: "+processId);
-        taskHistoryService.saveOfTask(this.taskModelList);
-        taskService.deleteByProcessId(processId);
+
+    public void MoveToHistory() {
+        log.info("[" + processId + "]se procede a mover hacia historico, processId: " + processId);
+        taskHistoryService.saveOfTask(taskModel);
+        taskService.deleteByProcessId(taskModel.getProcess_id());
         callBackService.ExecuteCallBack(processId);
     }
 
-    @Override
-    public void run() {
-        try {
-            while (status){
-                //actualiza a pendiente los estado para
-                //que no vuelvan a ser consultados en caso que demore su ejecucion de hilo
-                //se trabaja en memoria la lista por hilo para evitar realizar demaciadas consultas.
-                taskService.updateByProcessId(taskModelList);
-                callBackService=new CallBackService(configReader);
-                log.info("["+processId+"]Ejecutando Hilo para process_id: "+processId);
-                for (TaskModel taskModel : taskModelList) {
-                    if(taskModel.getReintentos()<=configReader.getMaxRetries()){
-                        log.info("["+processId+"]actualizando equipo en intento:"+taskModel.getReintentos(),"para el equipo ID Task: "+taskModel.getId());
-                        if(taskModel.getEstado().equals("I")){
-                            taskModel.setEstado("P");
-                            if(taskModel.getTasktype().equals("TR069")){
-                                if(!TR069(taskModel)){
-                                    MoveToHistory();
-                                    stop();
-                                    break;
-                                };
-                            }else{
-                                if(!update(taskModel)) {
-                                    MoveToHistory();
-                                    stop();
-                                    break;
-                                }
-                            }
-                            log.info("["+processId+"]Esperando tiempo de actualizacion para task ID: "+taskModel.getId()+", process_id: "+processId);
-                            Thread.sleep(configReader.getTimeout());
-                            break;
-                        }else{
-                            if(!checkStatus(taskModel)){
-                                MoveToHistory();
-                                stop();
-                                break;
-                            }
-                            if(taskModel.getEstado()!="F"){
-                                log.info("["+processId+"]Esperando tiempo de actualizacion para task ID: "+taskModel.getId()+", process_id: "+processId);
-                                Thread.sleep(configReader.getTimeout());
-                                break;
-                            }else{
-                                log.info("["+processId+"]Tarea completada para task ID: "+taskModel.getId()+", process_id: "+processId);
-                                taskHistoryService.saveTask(taskModel);
-                                taskModelList.remove(taskModel);
-                                if(taskModelList.isEmpty()){
-                                    MoveToHistory();
-                                    stop();
-                                }
-                                break;
-                            }
-                        }
-                    }else{
-                        log.info("["+processId+"]Reintentos maximo alcanzado para task: "+taskModel.getId()+", process_id: "+processId);
-                        ActualizarEstadoTask(this.taskModelList, taskModel.getId(), "E");
-                        MoveToHistory();
-                        stop();
-                        break;
-                    }
-                }
+    private void handleMaxRetries() {
+        log.info("[" + processId + "] Reintentos máximo alcanzado para task: " + taskModel.getId() + ", process_id: " + processId);
+        taskModel.setEstado("E");
+        MoveToHistory();
+    }
+
+    private void processInProgressTask() {
+        log.info("[" + processId + "] Actualizando equipo en intento: " + taskModel.getReintentos() + " para el equipo ID Task: " + taskModel.getId());
+        actualizarEstadoLista("P");
+        if (taskModel.getTasktype().equals("TR069")) {
+            if (TR069(taskModel)) {
+                log.info("[" + processId + "] Esperando tiempo de actualización para task ID: " + taskModel.getId() + ", process_id: " + processId);
+            } else {
+                logFailedTask(taskModel);
             }
-        }catch (Exception e){
-            stop();
-            log.error("Error al ejecutar el process_id: "+processId+", MENSAJE: "+e.getMessage());
-        }finally {
-            log.info("["+processId+"]Proceso Terminado, process_id: "+processId);
-            ThreadManagerService.threadCount.decrementAndGet();
+        } else {
+            if (update(taskModel)) {
+                log.info("[" + processId + "] Esperando tiempo de actualización para task ID: " + taskModel.getId() + ", process_id: " + processId);
+            } else {
+                logFailedTask(taskModel);
+            }
         }
     }
-    private void whenError(){
-        log.info("["+processId+"]se procede a mover hacia historico, processId: "+processId);
-        taskHistoryService.saveOfTask(this.taskModelList);
-        taskService.deleteByProcessId(processId);
-        callBackService.ExecuteCallBack(processId);
-        stop();
+
+    private void logFailedTask(TaskModel taskModel) {
+        log.info("[" + processId + "] La tarea ha fallado para task ID: " + taskModel.getId() + ", process_id: " + processId);
+        MoveToHistory();
     }
-    public void stop(){
-        status=false;
+
+    private void processCompletedTask() {
+        log.info("[" + processId + "] Tarea completada para task ID: " + taskModel.getId() + ", process_id: " + processId);
+        taskHistoryService.saveTask(taskModel);
+        taskService.remove(taskModel);
     }
-    public void start(){
-        status=true;
+
+    private void CheckState(TaskModel taskModel) {
+        log.info("[" + processId + "]Check Estado para task ID: " + taskModel.getId() + ", process_id: " + processId);
+        if(!checkStatus(taskModel)){
+            MoveToHistory();
+        }
+        if(taskModel.getEstado()!="F"){
+            log.info("["+processId+"]Esperando tiempo de actualizacion para task ID: "+taskModel.getId()+", process_id: "+processId);
+        }else{
+            processCompletedTask();
+        }
     }
-    private String ExtractValue(String response){
+
+    private TaskModel getNextTask() {
+        if (!ThreadManagerService.taskMap.isEmpty()) {
+            Map.Entry<String, TaskModel> entry = ThreadManagerService.taskMap.entrySet().iterator().next();
+            TaskModel taskModel = entry.getValue();
+            ThreadManagerService.taskMap.remove(entry.getKey());
+            return taskModel;
+        }
+        return null;
+    }
+
+    private String ExtractValue(String response) {
         try {
             JSONArray jsonArray = new JSONArray(response);
             JSONObject jsonObject = jsonArray.getJSONObject(0);
@@ -334,4 +294,45 @@ public class TaskExecuteService implements Runnable{
             throw new RuntimeException(e);
         }
     }
+    public void stop() {
+        status = false;
+    }
+
+    public void start() {
+        status = true;
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (status) {
+                synchronized (ThreadManagerService.taskMap) {
+                    taskModel = getNextTask();
+                    if (taskModel == null) {
+                        continue;
+                    }
+                }
+                configReader = ThreadManagerService.configReader;
+                processId = taskModel.getProcess_id();
+                callBackService = new CallBackService(configReader);
+                log.info("[" + processId + "]Ejecutando tarea para process_id: " + taskModel.getProcess_id());
+                if (taskModel.getReintentos() > configReader.getMaxRetries()) {
+                    handleMaxRetries();
+                } else if (taskModel.getEstado().equals("I")) {
+                    processInProgressTask();
+                } else if (taskModel.getEstado().equals("F")) {
+                    processCompletedTask();
+                } else {
+                    CheckState(taskModel);
+                }
+                taskModel.setReintentos(taskModel.getReintentos() + 1);
+            }
+        } catch (Exception e) {
+            log.error("Error al ejecutar el process_id: " + processId + ", MENSAJE: " + e.getMessage());
+        } finally {
+            ThreadManagerService.threadCount.decrementAndGet();
+        }
+    }
+
+
 }

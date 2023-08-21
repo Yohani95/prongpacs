@@ -15,27 +15,11 @@ TaskHistoryService {
 
     public void saveTask(TaskModel task) {TaskHistoryModel taskHistoryModel=setData(task); taskHistoryRepository.save(taskHistoryModel);}
 
-    public TaskHistoryModel getTaskById(Long id) {
-        return taskHistoryRepository.findById(id);
-    }
-
-    public List<TaskHistoryModel> getTasksByEstado(String estado) {
-        return taskHistoryRepository.findByEstado(estado);
-    }
-    public boolean saveByProcessId(String processId){
-        try{
-            return true;
-        }catch (Exception e){
-            return false;
-        }
-    }
-    public boolean saveOfTask(List<TaskModel> tasks){
+    public boolean saveOfTask(TaskModel task){
         try {
             TaskHistoryModel taskHistoryModel;
-            for (TaskModel task: tasks) {
                 taskHistoryModel=setData(task);
                 taskHistoryRepository.save(taskHistoryModel);
-            }
             return true;
         }catch (Exception e){
             log.info("Error Al mover hacia historico :"+ e.getMessage());

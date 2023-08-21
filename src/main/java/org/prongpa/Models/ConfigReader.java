@@ -1,7 +1,6 @@
 package org.prongpa.Models;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
