@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.prongpa.Models.TaskHistoryModel;
 import org.prongpa.Models.TaskModel;
 import org.prongpa.Repository.GenericRepository;
 
@@ -34,6 +35,7 @@ public abstract class HibernateGenericRepository<T, ID> implements GenericReposi
             status=true;
         } catch (Exception e) {
             transaction.rollback();
+            log.error("Error en update con la entidad, mensaje"+e.getMessage());
             throw e;
         } finally {
             session.close();
@@ -52,6 +54,7 @@ public abstract class HibernateGenericRepository<T, ID> implements GenericReposi
             status=true;
         } catch (Exception e) {
             transaction.rollback();
+            log.error("Error en update con la entidad, mensaje"+e.getMessage());
             throw e;
         } finally {
             session.close();
@@ -92,6 +95,7 @@ public abstract class HibernateGenericRepository<T, ID> implements GenericReposi
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
+            log.error("Error en update con la entidad, mensaje"+e.getMessage());
             throw e;
         } finally {
             session.close();

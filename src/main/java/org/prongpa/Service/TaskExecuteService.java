@@ -49,10 +49,10 @@ public class TaskExecuteService implements Runnable {
             taskRepository = new HibernateTaskRepository(sessionFactory);
             taskService = new TaskService(taskRepository);
             taskHistoryRepository = new HibernateTaskHistoryRepository(sessionFactory);
-            taskHistoryService = new TaskHistoryService(taskHistoryRepository);
+            taskHistoryService = new TaskHistoryService(taskRepository,taskHistoryRepository);
             start();
         } catch (Exception e) {
-            log.error("Error a cargar configuracion del subhilo Mensaje :" + e.getMessage());
+            log.error("[" + processId + "]Error a cargar configuracion del subhilo Mensaje :" + e.getMessage());
             stop();
         }
     }
@@ -110,11 +110,11 @@ public class TaskExecuteService implements Runnable {
                 // Error, realizar las acciones correspondientes
                 success = false;
                 actualizarEstadoLista( "E");
-                log.error("Error al actualizar el equipo " + task.getId() + " a la versión " + task.getVersion());
+                log.error("[" + processId + "]Error al actualizar el equipo " + task.getId() + " a la versión " + task.getVersion());
             }
         } catch (Exception e) {
             actualizarEstadoLista("E");
-            log.error("Error en la funcion Update, MENSAJE: " + e.getMessage());
+            log.error("[" + processId + "]Error en la funcion Update, MENSAJE: " + e.getMessage());
             success = false;
         } finally {
             return success;
@@ -138,8 +138,8 @@ public class TaskExecuteService implements Runnable {
                     int status = responseBody.toLowerCase().contains("_value") ? 1 : 0;
                     if (status <= 0) {
                         // No se encontró el equipo en genieacs
-                        log.error("Error No se pudo encontrar el equipo " + taskModel.getIdcompuesto() + " en genieacs, no se actualizará");
-                        log.error("Respuesta: " + responseBody);
+                        log.error("[" + processId + "]Error No se pudo encontrar el equipo " + taskModel.getIdcompuesto() + " en genieacs, no se actualizará");
+                        log.error("[" + processId + "]Respuesta: " + responseBody);
                         actualizarEstadoLista( "E");
                         sucess = false;
                     } else {
@@ -156,11 +156,16 @@ public class TaskExecuteService implements Runnable {
                             log.info("[" + processId + "]Aun esta pendiente la Actualización de la task " + taskModel.getId() + ", esperando intervalo de tiempo.");
                         }
                     }
+                }else{
+                    log.error("[" + processId + "]error en solicitud HTTP en la task id " + taskModel.getId() + ",");
+                    sucess = false;
                 }
             }
         } catch (Exception e) {
             sucess = false;
+            log.error("[" + processId + "]error en la task id " + taskModel.getId() + "Mensaje: "+e.getMessage());
             actualizarEstadoLista( "E");
+            MoveToHistory();
         } finally {
             return sucess;
         }
@@ -183,8 +188,8 @@ public class TaskExecuteService implements Runnable {
                 int result = responseBody.toLowerCase().contains("_value") ? 1 : 0;
 
                 if (result <= 0) {
-                    log.error("Error: No se pudo provisionar el equipo en ACS");
-                    log.error("Respuesta: " + responseBody);
+                    log.error("[" + processId + "]Error: No se pudo provisionar el equipo en ACS");
+                    log.error("[" + processId + "]Respuesta: " + responseBody);
                     actualizarEstadoLista( "E");
                     sucess = false;
                 } else {
@@ -195,12 +200,13 @@ public class TaskExecuteService implements Runnable {
                     sucess = true;
                 }
             } else {
-                log.error("Error al realizar peticion HTTP para la tarea task: " + taskModel.getId());
+                log.error("[" + processId + "]Error al realizar peticion HTTP para la tarea task: " + taskModel.getId());
                 actualizarEstadoLista("E");
                 sucess = false;
             }
         } catch (Exception e) {
             log.info("[" + processId + "]Error en la funcion TR069 MENSAJE: " + e.getMessage());
+            actualizarEstadoLista("E");
             sucess = false;
         } finally {
             return sucess;
@@ -213,22 +219,30 @@ public class TaskExecuteService implements Runnable {
         taskModel.setEstado(nuevoEstado);
         taskRepository.update(taskModel);
     }
+    public void actualizarReintentos() {
+        taskModel.setReintentos(taskModel.getReintentos() + 1);
+        taskRepository.update(taskModel);
+    }
 
     public void MoveToHistory() {
         log.info("[" + processId + "]se procede a mover hacia historico, processId: " + processId);
-        taskHistoryService.saveOfTask(taskModel);
-        taskService.deleteByProcessId(taskModel.getProcess_id());
+        taskHistoryService.copyDataToHistorico(taskModel.getProcess_id());
         callBackService.ExecuteCallBack(processId);
     }
-
     private void handleMaxRetries() {
         log.info("[" + processId + "] Reintentos máximo alcanzado para task: " + taskModel.getId() + ", process_id: " + processId);
         taskModel.setEstado("E");
+        taskRepository.update(taskModel);
         MoveToHistory();
     }
 
     private void processInProgressTask() {
+
         log.info("[" + processId + "] Actualizando equipo en intento: " + taskModel.getReintentos() + " para el equipo ID Task: " + taskModel.getId());
+        actualizarReintentos();
+        if(!GetVersionAcs()){
+            return;
+        }
         actualizarEstadoLista("P");
         if (taskModel.getTasktype().equals("TR069")) {
             if (TR069(taskModel)) {
@@ -258,8 +272,9 @@ public class TaskExecuteService implements Runnable {
 
     private void CheckState(TaskModel taskModel) {
         log.info("[" + processId + "]Check Estado para task ID: " + taskModel.getId() + ", process_id: " + processId);
+        actualizarReintentos();
         if(!checkStatus(taskModel)){
-            MoveToHistory();
+            logFailedTask(taskModel);
         }
         if(taskModel.getEstado()!="F"){
             log.info("["+processId+"]Esperando tiempo de actualizacion para task ID: "+taskModel.getId()+", process_id: "+processId);
@@ -294,6 +309,46 @@ public class TaskExecuteService implements Runnable {
             throw new RuntimeException(e);
         }
     }
+    private boolean GetVersionAcs(){
+        boolean sucess=true;
+        try{
+            String url = "http://" + configReader.getApiAcsUrl() + ":" + configReader.getApiAcsPort() + "/devices/?query=%7B%22_id%22%3A%22" + taskModel.getIdcompuesto() + "%22%7D&projection=InternetGatewayDevice.DeviceInfo.SoftwareVersion._value";
+            HttpResponse response = doHttpGet(url);
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity, "UTF-8");
+            if (response != null && response.getStatusLine().getStatusCode() == 200) {
+                // Evaluar el estado de la respuesta
+                int status = responseBody.toLowerCase().contains("_value") ? 1 : 0;
+                if (status <= 0) {
+                    // No se encontró el equipo en genieacs
+                    log.error("[" + processId + "]Error No se pudo encontrar el equipo " + taskModel.getIdcompuesto() + " en genieacs, para comprobar su version");
+                    log.error("[" + processId + "]Respuesta: " + responseBody);
+                    actualizarEstadoLista( "E");
+                    logFailedTask(taskModel);
+                    sucess = false;
+                } else {
+                    // Comparar la versión de ACS con la versión anterior
+                    String version_actual = ExtractValue(responseBody);
+                    String version_anterior = taskModel.getVersion();
+                    if (version_actual.equals(version_anterior)) {
+                        sucess = false;
+                        // Actualización completa
+                        log.info("[" + processId + "]EL equipo ya se encuentra actualizado " + taskModel.getId() + ", se moverá a la tabla histórica");
+                        actualizarEstadoLista( "F");
+                        log.info("[" + processId + "]se procede a mover hacia historico, processId: " + processId);
+                        taskHistoryService.saveOfTask(taskModel);
+                        taskService.deleteByProcessId(taskModel.getProcess_id());
+                    }
+                }
+            }
+        }catch (Exception e){
+            log.error("[" + processId + "]error en la task id " + taskModel.getId() + "Mensaje: "+e.getMessage());
+            actualizarEstadoLista( "E");
+            MoveToHistory();
+        }finally {
+            return sucess;
+        }
+    }
     public void stop() {
         status = false;
     }
@@ -306,7 +361,7 @@ public class TaskExecuteService implements Runnable {
     public void run() {
         try {
             while (status) {
-                synchronized (ThreadManagerService.taskMap) {
+                synchronized(ThreadManagerService.taskMap) {
                     taskModel = getNextTask();
                     if (taskModel == null) {
                         continue;
@@ -316,19 +371,20 @@ public class TaskExecuteService implements Runnable {
                 processId = taskModel.getProcess_id();
                 callBackService = new CallBackService(configReader);
                 log.info("[" + processId + "]Ejecutando tarea para process_id: " + taskModel.getProcess_id());
-                if (taskModel.getReintentos() > configReader.getMaxRetries()) {
+                if (taskModel.getReintentos() >= configReader.getMaxRetries()) {
                     handleMaxRetries();
                 } else if (taskModel.getEstado().equals("I")) {
                     processInProgressTask();
                 } else if (taskModel.getEstado().equals("F")) {
                     processCompletedTask();
+                } else if (taskModel.getEstado().equals("E")) {
+                    logFailedTask(taskModel);
                 } else {
                     CheckState(taskModel);
                 }
-                taskModel.setReintentos(taskModel.getReintentos() + 1);
             }
         } catch (Exception e) {
-            log.error("Error al ejecutar el process_id: " + processId + ", MENSAJE: " + e.getMessage());
+            log.error("[" + processId + "]Error al ejecutar el process_id: " + processId + ", MENSAJE: " + e.getMessage());
         } finally {
             ThreadManagerService.threadCount.decrementAndGet();
         }

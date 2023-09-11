@@ -1,5 +1,6 @@
 package org.prongpa.Repository.Task;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.prongpa.Models.TaskModel;
 import org.prongpa.Repository.Hibernate.HibernateGenericRepository;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 public class HibernateTaskRepository extends HibernateGenericRepository<TaskModel, Long> implements TaskRepository {
     private final SessionFactory sessionFactory;
     public HibernateTaskRepository(SessionFactory sessionFactory) {
@@ -42,25 +44,25 @@ public class HibernateTaskRepository extends HibernateGenericRepository<TaskMode
                     task.setThread_id(null);
                 }
                 task.setModel((String) row[5]);
-                task.setReintentos((int) row[6]);
-                task.setVersion((String) row[7].toString());
-                task.setTasktype((String) row[8]);
-                task.setIdcompuesto((String) row[9]);
-                task.setFilename((String) row[10]);
-                task.setNotificationId((String) row[11]);
-                task.setCommands((String) row[12]);
-
+                task.setOrderTask((int) row[6]);
+                task.setReintentos((int) row[7]);
+                task.setVersion((String) row[8].toString());
+                task.setTasktype((String) row[9]);
+                task.setIdcompuesto((String) row[10]);
+                task.setFilename((String) row[11]);
+                task.setNotificationId((String) row[12]);
+                task.setCommands((String) row[13]);
                 // Verifica si hay un campo 'mercado' en la consulta
-                if (row.length > 13) {
-                    task.setMercado((String) row[13]);
+                if (row.length > 14) {
+                    task.setMercado((String) row[14]);
                 }
-
+                task.setManufacturer((String) row[15]);
                 results.add(task);
             }
 
             return results;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error en la llamada a la vista view_candidate , mensaje"+e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -93,4 +95,5 @@ public class HibernateTaskRepository extends HibernateGenericRepository<TaskMode
         taskToUpdate.setLastDate(new Date(currentTime));
         return save(taskToUpdate);
     }
+
 }

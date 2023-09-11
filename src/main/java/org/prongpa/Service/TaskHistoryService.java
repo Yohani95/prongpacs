@@ -3,16 +3,20 @@ package org.prongpa.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.prongpa.Models.TaskHistoryModel;
 import org.prongpa.Models.TaskModel;
+import org.prongpa.Repository.Task.TaskRepository;
 import org.prongpa.Repository.TaskHistory.TaskHistoryRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 @Slf4j
 public class
 TaskHistoryService {
     private final TaskHistoryRepository taskHistoryRepository;
-
-    public TaskHistoryService(TaskHistoryRepository taskHistoryRepository) {this.taskHistoryRepository = taskHistoryRepository;}
-
+    private final TaskRepository taskRepository;
+    public TaskHistoryService(TaskRepository taskRepository, TaskHistoryRepository taskHistoricoRepository) {
+        this.taskRepository = taskRepository;
+        this.taskHistoryRepository = taskHistoricoRepository;
+    }
     public void saveTask(TaskModel task) {TaskHistoryModel taskHistoryModel=setData(task); taskHistoryRepository.save(taskHistoryModel);}
 
     public boolean saveOfTask(TaskModel task){
@@ -24,6 +28,20 @@ TaskHistoryService {
         }catch (Exception e){
             log.info("Error Al mover hacia historico :"+ e.getMessage());
             return false;
+        }
+    }
+    @Transactional
+    public void copyDataToHistorico(String processId) {
+        try{
+            List<TaskModel> tasks = taskRepository.findByCustomCriteria("FROM TaskModel t WHERE t.process_id = ?1",  processId);
+
+            for (TaskModel task : tasks) {
+                TaskHistoryModel taskHistorico = setData(task);
+                taskHistoryRepository.save(taskHistorico);
+            }
+            taskRepository.deleteByProcessId(processId);
+        }catch (Exception e){
+            log.info("Error Al mover hacia historico :"+ e.getMessage());
         }
     }
     private  TaskHistoryModel setData(TaskModel task){
@@ -49,6 +67,9 @@ TaskHistoryService {
     }
     public void saveByTaskModel(TaskModel task){
         taskHistoryRepository.save(setData(task));
+    }
+    public void saveByprocessId(String processId){
+        taskHistoryRepository.saveByProcessId(processId);
     }
 
 }

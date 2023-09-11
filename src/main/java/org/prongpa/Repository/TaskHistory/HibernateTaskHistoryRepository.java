@@ -33,4 +33,5 @@ public class HibernateTaskHistoryRepository extends HibernateGenericRepository<T
     public void saveByProcessId(String processId) {
 
     }
+
 }

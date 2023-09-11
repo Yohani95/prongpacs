@@ -64,7 +64,7 @@ public class ThreadManagerService implements Runnable {
         ConfigRepository configRepository = new HibernateConfigRepository(sessionFactory);
         ConfigServices configServices = new ConfigServices(configRepository);
         configDBModel = configServices.GetConfig();
-        //configReader.setTimeout(Integer.parseInt(configDBModel.getAcsRestartTime())* 60 * 1000);
+        configReader.setWaitProcess(Integer.parseInt(configDBModel.getAcsRestartTime()));
         configReader.setMaxThreads(Integer.parseInt(configDBModel.getMaxThreads()));
         configReader.setMaxRetries(Integer.parseInt(configDBModel.getMaxReintentos()));
     }
@@ -73,14 +73,22 @@ public class ThreadManagerService implements Runnable {
         while (status) {
             try {
                 ReloadConfig();
+                for (int i = getThreadCount(); i < configReader.getMaxThreads(); i++) {
+                    Thread taskThread = new Thread(new TaskExecuteService(configReader));
+                    taskThread.start();
+                    threadCount.incrementAndGet();
+                    if (getThreadCount() >= configReader.getMaxThreads()) {
+                        log.info("Se alcanzó el máximo de hilos permitidos.");
+                        break;
+                    }
+                }
+
                 log.info("Buscando tareas activas");
                 // Consultar la base de datos para obtener las tareas activas
                 List<TaskModel> activeTasks = taskService.findFromViewCandidates();
                 if (activeTasks.isEmpty()) {
                     log.info("sin tareas activas");
-                    log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: " + configReader.getTimeout() / (60 * 1000) + " minutos");
-                    Thread.sleep(configReader.getTimeout());
-                } else {
+              } else {
                     long currentTime = System.currentTimeMillis();
                     List<TaskModel> filteredTasks = new ArrayList<>();
                     for (TaskModel task : activeTasks) {
@@ -102,14 +110,9 @@ public class ThreadManagerService implements Runnable {
                         }
                     } // Desbloquear el acceso al taskMap
                 }
-                for (int i = 0; i < configReader.getMaxThreads(); i++) {
-                    Thread taskThread = new Thread(new TaskExecuteService(configReader));
-                    taskThread.start();
-                    threadCount.incrementAndGet();
-                }
-                log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: " + configReader.getWaitProcess() / (60 * 1000) + " minutos");
-                log.info("Hilos trabajando actualmente: " + getThreadCount());
-                Thread.sleep(configReader.getWaitProcess()); // Esperar el intervalo de tiempo especificado para que se vuelvan a consultar las tareas
+                log.info("Esperando el intervalo de tiempo especificado para que se vuelvan a consultar las tareas, TIEMPO: " + configReader.getTimeout() / (60 * 1000) + " minutos");
+                log.info("Sub-Hilos trabajando en Tareas actualmente: " + getThreadCount());
+                Thread.sleep(configReader.getTimeout()); // Esperar el intervalo de tiempo especificado para que se vuelvan a consultar las tareas
             } catch (InterruptedException e) {
                 log.error("Error mientras se ejecutaba el hilo padre MENSAJE: " + e.getMessage());
                 stop();
